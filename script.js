@@ -1439,6 +1439,9 @@ const GlassOS = {
         PerformanceOptimizer.init();
         SnapLayouts.init();
         
+        // Inicializar QuickSettingsManager
+        QuickSettingsManager.init();
+        
         // Mostrar tela de login/bloqueio imediatamente ao iniciar o sistema
         setTimeout(() => {
             LockScreen.lock();
@@ -1468,14 +1471,45 @@ const GlassOS = {
         if (trayNotifications) trayNotifications.innerHTML = renderIcon('notifications', 16);
     },
     startClock() {
-        const clockEl = document.getElementById('tray-clock'), dateEl = document.getElementById('tray-date');
-        function update() { const now = new Date(); clockEl.textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); dateEl.textContent = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
-        update(); setInterval(update, 1000);
+        const timeEl = document.getElementById('tray-time');
+        const dateEl = document.getElementById('tray-date');
+        
+        function update() {
+            const now = new Date();
+            
+            // Hora no formato HH:MM (sem segundos para limpeza visual)
+            if (timeEl) {
+                timeEl.textContent = now.toLocaleTimeString('pt-BR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false 
+                });
+            }
+            
+            // Data no formato DD/MM/AAAA
+            if (dateEl) {
+                dateEl.textContent = now.toLocaleDateString('pt-BR', { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    year: 'numeric' 
+                });
+            }
+        }
+        
+        update();
+        setInterval(update, 1000);
     },
     setupGlobalEvents() {
         document.getElementById('btn-start').addEventListener('click', (e) => { e.stopPropagation(); this.toggleStartMenu(); });
         document.getElementById('start-search-input').addEventListener('input', (e) => { AppRegistry.renderStartMenu(e.target.value); });
-        document.addEventListener('click', (e) => { if (this.isStartOpen && !e.target.closest('#start-menu') && !e.target.closest('#btn-start')) this.closeStartMenu(); this.hideContextMenu(); });
+        document.addEventListener('click', (e) => {
+            if (this.isStartOpen && !e.target.closest('#start-menu') && !e.target.closest('#btn-start')) this.closeStartMenu();
+            this.hideContextMenu();
+            // Fecha Quick Settings se clicar fora
+            if (!e.target.closest('#quick-settings-panel') && !e.target.closest('#tray-clock-container')) {
+                QuickSettingsManager.close();
+            }
+        });
         document.getElementById('desktop').addEventListener('contextmenu', (e) => { if (e.target.closest('.window') || e.target.closest('#taskbar') || e.target.closest('#start-menu')) return; e.preventDefault(); this.showContextMenu(e.clientX, e.clientY); });
         document.getElementById('context-menu').addEventListener('click', (e) => { const item = e.target.closest('[data-action]'); if (!item) return; switch (item.dataset.action) { case 'refresh': location.reload(); break; case 'wallpaper': AppRegistry.open('settings'); break; case 'settings': AppRegistry.open('settings'); break; case 'widget': const type = prompt('Tipo de widget (clock, sysmon, weather):', 'clock'); if (type) WidgetSystem.create(type); break; case 'about': this.showAboutModal(); break; } });
         document.getElementById('btn-restart').addEventListener('click', () => { this.closeStartMenu(); this.shutdown('Reiniciando...'); });
@@ -1500,7 +1534,7 @@ const GlassOS = {
             if (e.altKey && e.key === 'Tab') { e.preventDefault(); if (!document.getElementById('alt-tab-overlay').classList.contains('hidden')) this.cycleAltTab(); else this.showAltTab(); }
             if ((e.ctrlKey && e.shiftKey && e.key === 'F') || (e.key === 'l' && (e.metaKey || e.ctrlKey))) { e.preventDefault(); GlobalSearch.toggle(); }
             if ((e.key === 'l' || e.key === 'L') && (e.metaKey || e.ctrlKey)) { e.preventDefault(); LockScreen.lock(); }
-            if (e.key === 'Escape') { this.closeStartMenu(); this.hideContextMenu(); this.hideAltTab(); this.closeAllModals(); }
+            if (e.key === 'Escape') { this.closeStartMenu(); this.hideContextMenu(); this.hideAltTab(); this.closeAllModals(); QuickSettingsManager.close(); }
         });
         document.addEventListener('keyup', (e) => { if (e.key === 'Alt') this.hideAltTab(); });
     },
@@ -1580,6 +1614,255 @@ const GlassOS = {
             if (message.includes('Reiniciando')) location.reload();
             else { document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;font-family:system-ui;text-align:center;"><div><p style="font-size:24px;margin-bottom:16px;">GlassOS desligado</p><p style="font-size:14px;color:#888;cursor:pointer;" onclick="location.reload()">Clique para ligar</p></div></div>`; }
         }, 2500);
+    }
+};
+
+// ===== GERENCIADOR DE CONFIGURAÇÕES RÁPIDAS =====
+const QuickSettingsManager = {
+    init() {
+        // Event listener para abrir o painel ao clicar no relógio
+        const trayClockContainer = document.getElementById('tray-clock-container');
+        if (trayClockContainer) {
+            trayClockContainer.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggle();
+            });
+        }
+        
+        // Event listener para fechar
+        const qsClose = document.getElementById('qs-close');
+        if (qsClose) {
+            qsClose.addEventListener('click', () => this.close());
+        }
+        
+        // Event listeners para sliders
+        const volumeSlider = document.getElementById('qs-volume');
+        const brightnessSlider = document.getElementById('qs-brightness');
+        
+        if (volumeSlider) {
+            volumeSlider.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                const valDisplay = document.getElementById('qs-volume-val');
+                if (valDisplay) valDisplay.textContent = value + '%';
+                
+                // Atualiza SoundManager
+                SoundManager.init();
+                SoundManager.setVolume(value / 100);
+                
+                // Salva preferência
+                localStorage.setItem('glassos_volume', (value / 100).toString());
+            });
+        }
+        
+        if (brightnessSlider) {
+            brightnessSlider.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                const valDisplay = document.getElementById('qs-brightness-val');
+                if (valDisplay) valDisplay.textContent = value + '%';
+                
+                // Simula brilho com overlay
+                const overlay = document.getElementById('brightness-overlay');
+                if (overlay) {
+                    const opacity = (100 - value) / 100 * 0.8; // Máximo 80% escuro
+                    overlay.style.opacity = opacity.toString();
+                }
+                
+                // Salva preferência
+                localStorage.setItem('glassos_brightness', value.toString());
+            });
+        }
+        
+        // Event listeners para toggles
+        this.setupToggle('qs-wifi', 'Wi-Fi');
+        this.setupToggle('qs-bluetooth', 'Bluetooth');
+        this.setupToggle('qs-airplane', 'Modo Avião');
+        
+        // Toggle de Foco (integra com NotificationSystem)
+        const focusToggle = document.getElementById('qs-focus');
+        if (focusToggle) {
+            focusToggle.addEventListener('click', () => {
+                const isActive = focusToggle.classList.toggle('active');
+                focusToggle.setAttribute('data-state', isActive.toString());
+                
+                // Integra com sistema de notificações
+                if (typeof GlassOS.notificationSystem !== 'undefined') {
+                    GlassOS.notificationSystem.toggleFocusMode();
+                }
+                
+                // Sincroniza estado visual
+                const notifFocusBtn = document.getElementById('notif-focus-mode');
+                if (notifFocusBtn) {
+                    if (isActive) {
+                        notifFocusBtn.textContent = '☀️ Modo Foco (Ativo)';
+                        notifFocusBtn.classList.add('active');
+                    } else {
+                        notifFocusBtn.textContent = '🌙 Modo Foco';
+                        notifFocusBtn.classList.remove('active');
+                    }
+                }
+                
+                // Salva estado
+                localStorage.setItem('glassos_qs_focus', isActive.toString());
+            });
+        }
+        
+        // Toggle de Economia de Energia
+        const powerSaveToggle = document.getElementById('qs-power-save');
+        if (powerSaveToggle) {
+            powerSaveToggle.addEventListener('click', () => {
+                const isActive = powerSaveToggle.classList.toggle('active');
+                powerSaveToggle.setAttribute('data-state', isActive.toString());
+                
+                // Integra com PerformanceOptimizer
+                if (typeof GlassOS.performanceOptimizer !== 'undefined') {
+                    GlassOS.performanceOptimizer.toggleLightMode();
+                }
+                
+                // Salva estado
+                localStorage.setItem('glassos_qs_power_save', isActive.toString());
+            });
+        }
+        
+        // Botão de Configurações
+        const settingsBtn = document.getElementById('qs-settings-btn');
+        if (settingsBtn) {
+            settingsBtn.addEventListener('click', () => {
+                this.close();
+                AppRegistry.open('settings');
+            });
+        }
+        
+        // Renderizar ícones SVG nos toggles
+        this.renderToggleIcons();
+        
+        // Carregar estados salvos
+        this.loadSavedStates();
+    },
+    
+    setupToggle(id, name) {
+        const toggle = document.getElementById(id);
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                const isActive = toggle.classList.toggle('active');
+                toggle.setAttribute('data-state', isActive.toString());
+                
+                // Mostra toast informando que é simulação
+                GlassOS.showToast(`${name} ${isActive ? 'ativado' : 'desativado'} (simulação)`);
+                
+                // Salva estado
+                localStorage.setItem(`glassos_qs_${id.replace('qs-', '')}`, isActive.toString());
+            });
+        }
+    },
+    
+    renderToggleIcons() {
+        // Ícones SVG para cada toggle
+        const icons = {
+            'qs-wifi-icon': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>',
+            'qs-bluetooth-icon': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"/></svg>',
+            'qs-airplane-icon': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20"/><path d="M13 2l9 10-9 10"/><path d="M2 12l5-5m-5 5l5 5"/></svg>',
+            'qs-focus-icon': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+            'qs-power-icon': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+            'qs-settings-icon': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'
+        };
+        
+        Object.keys(icons).forEach(iconId => {
+            const el = document.getElementById(iconId);
+            if (el) {
+                el.innerHTML = icons[iconId];
+            }
+        });
+        
+        // Ícones para sliders
+        const volumeIcon = document.getElementById('qs-volume-icon');
+        if (volumeIcon) {
+            volumeIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
+        }
+        
+        const brightnessIcon = document.getElementById('qs-brightness-icon');
+        if (brightnessIcon) {
+            brightnessIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+        }
+    },
+    
+    toggle() {
+        const panel = document.getElementById('quick-settings-panel');
+        if (!panel) return;
+        
+        const isHidden = panel.classList.contains('hidden');
+        
+        if (isHidden) {
+            // Abre o painel
+            panel.classList.remove('hidden');
+            
+            // Fecha outros menus
+            if (typeof GlassOS !== 'undefined') {
+                GlassOS.closeStartMenu();
+            }
+            document.getElementById('notification-center')?.classList.add('hidden');
+            
+            // Foca no primeiro elemento interativo
+            setTimeout(() => {
+                const firstInteractive = panel.querySelector('button, input');
+                if (firstInteractive) firstInteractive.focus();
+            }, 100);
+        } else {
+            this.close();
+        }
+    },
+    
+    close() {
+        document.getElementById('quick-settings-panel')?.classList.add('hidden');
+    },
+    
+    loadSavedStates() {
+        // Carregar volume
+        const savedVolume = localStorage.getItem('glassos_volume');
+        if (savedVolume) {
+            const volume = parseFloat(savedVolume) * 100;
+            const volumeSlider = document.getElementById('qs-volume');
+            const volumeVal = document.getElementById('qs-volume-val');
+            if (volumeSlider) volumeSlider.value = volume;
+            if (volumeVal) volumeVal.textContent = Math.round(volume) + '%';
+        }
+        
+        // Carregar brilho
+        const savedBrightness = localStorage.getItem('glassos_brightness');
+        if (savedBrightness) {
+            const brightness = parseInt(savedBrightness);
+            const brightnessSlider = document.getElementById('qs-brightness');
+            const brightnessVal = document.getElementById('qs-brightness-val');
+            if (brightnessSlider) brightnessSlider.value = brightness;
+            if (brightnessVal) brightnessVal.textContent = brightness + '%';
+            
+            // Aplicar overlay de brilho
+            const overlay = document.getElementById('brightness-overlay');
+            if (overlay) {
+                const opacity = (100 - brightness) / 100 * 0.8;
+                overlay.style.opacity = opacity.toString();
+            }
+        }
+        
+        // Carregar estados dos toggles
+        const toggleStates = {
+            'qs-wifi': 'glassos_qs_wifi',
+            'qs-bluetooth': 'glassos_qs_bluetooth',
+            'qs-airplane': 'glassos_qs_airplane',
+            'qs-focus': 'glassos_qs_focus',
+            'qs-power-save': 'glassos_qs_power_save'
+        };
+        
+        Object.keys(toggleStates).forEach(toggleId => {
+            const storageKey = toggleStates[toggleId];
+            const saved = localStorage.getItem(storageKey);
+            if (saved === 'true') {
+                const toggle = document.getElementById(toggleId);
+                if (toggle) {
+                    toggle.classList.add('active');
+                    toggle.setAttribute('data-state', 'true');
+                }
+            }
+        });
     }
 };
 
