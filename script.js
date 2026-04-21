@@ -1,5 +1,321 @@
 // script.js - COMPLETO COM TODAS AS NOVAS FUNCIONALIDADES
 
+// ===== GERENCIADOR DE EFEITOS SONOROS (SFX) =====
+const SoundManager = {
+    ctx: null,
+    masterGain: null,
+    isMuted: false,
+    volume: 0.3,
+    initialized: false,
+
+    init() {
+        if (this.initialized) return;
+        
+        try {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            this.masterGain = this.ctx.createGain();
+            this.masterGain.connect(this.ctx.destination);
+            this.masterGain.gain.value = this.volume;
+            this.initialized = true;
+            console.log('SoundManager inicializado');
+        } catch (e) {
+            console.warn('Web Audio API não suportada:', e);
+        }
+    },
+
+    resume() {
+        if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+        }
+    },
+
+    setVolume(level) {
+        this.volume = Math.max(0, Math.min(1, level));
+        this.isMuted = this.volume === 0;
+        if (this.masterGain) {
+            this.masterGain.gain.value = this.volume;
+        }
+        localStorage.setItem('glassos_volume', this.volume.toString());
+        localStorage.setItem('glassos_muted', this.isMuted.toString());
+    },
+
+    toggleMute() {
+        if (this.isMuted) {
+            this.setVolume(parseFloat(localStorage.getItem('glassos_volume')) || 0.3);
+        } else {
+            const lastVol = this.volume;
+            this.setVolume(0);
+            localStorage.setItem('glassos_last_volume', lastVol.toString());
+        }
+        return this.isMuted;
+    },
+
+    play(soundName) {
+        if (!this.initialized || this.isMuted || !this.ctx) return;
+        this.resume();
+
+        const now = this.ctx.currentTime;
+
+        switch (soundName) {
+            case 'boot':
+                this._playBoot(now);
+                break;
+            case 'shutdown':
+                this._playShutdown(now);
+                break;
+            case 'click':
+                this._playClick(now);
+                break;
+            case 'openWindow':
+                this._playOpenWindow(now);
+                break;
+            case 'closeWindow':
+                this._playCloseWindow(now);
+                break;
+            case 'minimize':
+                this._playMinimize(now);
+                break;
+            case 'error':
+                this._playError(now);
+                break;
+            case 'notification':
+                this._playNotification(now);
+                break;
+            case 'typing':
+                this._playTyping(now);
+                break;
+            case 'test':
+                this._playTestSequence();
+                break;
+        }
+    },
+
+    _playBoot(now) {
+        // Acorde maior ascendente (C-E-G) com envelope suave
+        const frequencies = [261.63, 329.63, 392.00]; // C4, E4, G4
+        frequencies.forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            const filter = this.ctx.createBiquadFilter();
+
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(200, now);
+            filter.frequency.linearRampToValueAtTime(2000, now + 0.5);
+
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(0.15, now + 0.3 + i * 0.1);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.masterGain);
+
+            osc.start(now);
+            osc.stop(now + 1.5);
+        });
+    },
+
+    _playShutdown(now) {
+        // Acorde descendente com fade-out
+        const frequencies = [392.00, 329.63, 261.63]; // G4, E4, C4
+        frequencies.forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+
+            gain.gain.setValueAtTime(0.15, now + i * 0.15);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.0 + i * 0.15);
+
+            osc.connect(gain);
+            gain.connect(this.masterGain);
+
+            osc.start(now + i * 0.15);
+            osc.stop(now + 1.2 + i * 0.15);
+        });
+    },
+
+    _playClick(now) {
+        // Tick agudo e curto
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(800, now);
+
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+
+        osc.start(now);
+        osc.stop(now + 0.05);
+    },
+
+    _playOpenWindow(now) {
+        // Whoosh ascendente
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.linearRampToValueAtTime(600, now + 0.2);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(300, now);
+        filter.frequency.linearRampToValueAtTime(1500, now + 0.2);
+
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.12, now + 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.masterGain);
+
+        osc.start(now);
+        osc.stop(now + 0.2);
+    },
+
+    _playCloseWindow(now) {
+        // Whoosh descendente (reverso do open)
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.linearRampToValueAtTime(200, now + 0.2);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(1500, now);
+        filter.frequency.linearRampToValueAtTime(300, now + 0.2);
+
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.12, now + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.masterGain);
+
+        osc.start(now);
+        osc.stop(now + 0.2);
+    },
+
+    _playMinimize(now) {
+        // Tom rápido descendo em pitch
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(500, now);
+        osc.frequency.exponentialRampToValueAtTime(150, now + 0.15);
+
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+
+        osc.start(now);
+        osc.stop(now + 0.15);
+    },
+
+    _playError(now) {
+        // Dois tons graves dissonantes
+        const frequencies = [150, 140];
+        frequencies.forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'sawtooth';
+            osc.frequency.value = freq;
+
+            gain.gain.setValueAtTime(0.08, now + i * 0.1);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3 + i * 0.1);
+
+            osc.connect(gain);
+            gain.connect(this.masterGain);
+
+            osc.start(now + i * 0.1);
+            osc.stop(now + 0.4 + i * 0.1);
+        });
+    },
+
+    _playNotification(now) {
+        // Ding agradável - duas frequências harmônicas
+        const frequencies = [880, 1760]; // A5, A6
+        frequencies.forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(0.15, now + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+            osc.connect(gain);
+            gain.connect(this.masterGain);
+
+            osc.start(now);
+            osc.stop(now + 0.6);
+        });
+    },
+
+    _playTyping(now) {
+        // Som mecânico suave
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
+
+        osc.type = 'square';
+        osc.frequency.value = 2000;
+
+        filter.type = 'highpass';
+        filter.frequency.value = 1000;
+
+        gain.gain.setValueAtTime(0.02, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.masterGain);
+
+        osc.start(now);
+        osc.stop(now + 0.03);
+    },
+
+    _playTestSequence() {
+        // Toca todos os sons em sequência para teste
+        const sounds = ['click', 'openWindow', 'closeWindow', 'minimize', 'notification', 'error'];
+        sounds.forEach((sound, i) => {
+            setTimeout(() => this.play(sound), i * 300);
+        });
+    }
+};
+
+// Carregar configurações de áudio salvas
+(function loadAudioSettings() {
+    const savedVol = localStorage.getItem('glassos_volume');
+    const savedMuted = localStorage.getItem('glassos_muted');
+    if (savedVol) {
+        SoundManager.volume = parseFloat(savedVol);
+    }
+    if (savedMuted === 'true') {
+        SoundManager.isMuted = true;
+        SoundManager.volume = 0;
+    }
+})();
+
 // ===== SISTEMA DE ÍCONES SVG =====
 const GlassIcons = {
     // APLICATIVOS PRINCIPAIS
@@ -118,6 +434,9 @@ const WindowManager = {
     resizeState: null,
 
     create(appId, title, icon, contentHTML, options = {}) {
+        // Tocar som de abrir janela
+        SoundManager.play('openWindow');
+        
         const id = `win_${appId}_${Date.now()}`;
         const defaultWidth = options.width || 700;
         const defaultHeight = options.height || 480;
@@ -222,6 +541,10 @@ const WindowManager = {
     minimize(winId) {
         const winData = this.windows.get(winId);
         if (!winData) return;
+        
+        // Tocar som de minimizar
+        SoundManager.play('minimize');
+        
         winData.element.classList.add('minimized');
         winData.minimized = true;
         if (this.activeWindowId === winId) this.activeWindowId = null;
@@ -255,6 +578,10 @@ const WindowManager = {
         const winData = this.windows.get(winId);
         if (!winData) return;
         if (winData.onClose) winData.onClose();
+        
+        // Tocar som de fechar janela
+        SoundManager.play('closeWindow');
+        
         winData.element.remove();
         this.windows.delete(winId);
         if (this.activeWindowId === winId) this.activeWindowId = null;
@@ -416,6 +743,9 @@ const NotificationSystem = {
         if (badge) badge.innerHTML = count > 0 ? renderIcon('notifications', 16) + `<span style="margin-left:4px">${count}</span>` : renderIcon('notifications', 16);
     },
     showToast(title, message, type) {
+        // Tocar som de notificação
+        SoundManager.play('notification');
+        
         const container = document.getElementById('toast-container');
         if (!container) return;
         const icons = { 
@@ -857,8 +1187,40 @@ Apps.Settings = function() {
     const settings = ThemeManager.getSettings();
     let wallpaperOptionsHTML = '';
     Object.entries(ThemeManager.wallpapers).forEach(([name, gradient]) => { wallpaperOptionsHTML += `<div class="wallpaper-option ${settings.wallpaper === gradient ? 'selected' : ''}" data-wallpaper="${gradient}" style="background: ${gradient};" title="${name}"></div>`; });
-    const html = `<div class="settings-container"><div class="settings-section"><h3>${renderIcon('paint', 20)} Tema</h3><div class="settings-option"><label>Tema do sistema</label><select data-setting="theme"><option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>Escuro</option><option value="light" ${settings.theme === 'light' ? 'selected' : ''}>Claro</option><option value="glass" ${settings.theme === 'glass' ? 'selected' : ''}>Glass</option><option value="retro" ${settings.theme === 'retro' ? 'selected' : ''}>Retro</option><option value="cyberpunk" ${settings.theme === 'cyberpunk' ? 'selected' : ''}>Cyberpunk</option></select></div></div><div class="settings-section"><h3>${renderIcon('imageeditor', 20)} Papel de Parede</h3><div class="wallpaper-grid">${wallpaperOptionsHTML}</div><div class="wallpaper-custom-input"><input type="text" placeholder="URL de imagem personalizada..." id="custom-wallpaper-url"><button id="apply-custom-wallpaper">Aplicar</button></div></div><div class="settings-section"><h3>✨ Aparência</h3><div class="settings-option"><label>Transparência</label><input type="range" min="50" max="100" value="${Math.round(settings.transparency * 100)}" data-setting="transparency"></div><div class="settings-option"><label>Desfoque (Blur)</label><input type="range" min="0" max="40" value="${settings.blur}" data-setting="blur"></div><div class="settings-option"><label>Modo Leve</label><button id="toggle-light-mode" style="padding:6px 14px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:6px;cursor:pointer;font-size:12px;">${PerformanceOptimizer.mode === 'light' ? 'Desativar' : 'Ativar'}</button></div></div><div class="settings-section"><h3>${renderIcon('sysmon', 20)} Sobre o GlassOS</h3><div class="settings-option"><label>Versão</label><span style="font-size:13px; color:var(--text-secondary);">GlassOS v1.1</span></div></div><div class="settings-section"><h3>🗃️ Dados</h3><div class="settings-option"><label>Limpar dados</label><button id="btn-clear-data" style="padding:6px 14px; border:1px solid var(--danger-color); background:transparent; color:var(--danger-color); border-radius:6px; cursor:pointer; font-size:12px;">Limpar</button></div></div></div>`;
-    const winData = WindowManager.create('settings', 'Configurações', GlassIcons.settings, html, { width: 550, height: 580 });
+    const html = `<div class="settings-container"><div class="settings-section"><h3>${renderIcon('paint', 20)} Tema</h3><div class="settings-option"><label>Tema do sistema</label><select data-setting="theme"><option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>Escuro</option><option value="light" ${settings.theme === 'light' ? 'selected' : ''}>Claro</option><option value="glass" ${settings.theme === 'glass' ? 'selected' : ''}>Glass</option><option value="retro" ${settings.theme === 'retro' ? 'selected' : ''}>Retro</option><option value="cyberpunk" ${settings.theme === 'cyberpunk' ? 'selected' : ''}>Cyberpunk</option></select></div></div><div class="settings-section"><h3>${renderIcon('imageeditor', 20)} Papel de Parede</h3><div class="wallpaper-grid">${wallpaperOptionsHTML}</div><div class="wallpaper-custom-input"><input type="text" placeholder="URL de imagem personalizada..." id="custom-wallpaper-url"><button id="apply-custom-wallpaper">Aplicar</button></div></div><div class="settings-section"><h3>🔊 Som</h3><div class="settings-option"><label>Volume</label><input type="range" min="0" max="100" value="${Math.round((SoundManager.volume || 0.3) * 100)}" id="sound-volume-slider" style="width:150px;"></div><div class="settings-option"><label>Mutar sistema</label><button id="btn-sound-mute" style="padding:6px 14px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:6px;cursor:pointer;font-size:12px;">${SoundManager.isMuted ? 'Desmutar' : 'Mutuar'}</button></div><div class="settings-option"><label>Testar sons</label><button id="btn-test-sounds" style="padding:6px 14px;border:1px solid var(--accent-color);background:transparent;color:var(--accent-color);border-radius:6px;cursor:pointer;font-size:12px;">Tocar SFX</button></div></div><div class="settings-section"><h3>✨ Aparência</h3><div class="settings-option"><label>Transparência</label><input type="range" min="50" max="100" value="${Math.round(settings.transparency * 100)}" data-setting="transparency"></div><div class="settings-option"><label>Desfoque (Blur)</label><input type="range" min="0" max="40" value="${settings.blur}" data-setting="blur"></div><div class="settings-option"><label>Modo Leve</label><button id="toggle-light-mode" style="padding:6px 14px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:6px;cursor:pointer;font-size:12px;">${PerformanceOptimizer.mode === 'light' ? 'Desativar' : 'Ativar'}</button></div></div><div class="settings-section"><h3>${renderIcon('sysmon', 20)} Sobre o GlassOS</h3><div class="settings-option"><label>Versão</label><span style="font-size:13px; color:var(--text-secondary);">GlassOS v1.2</span></div></div><div class="settings-section"><h3>🗃️ Dados</h3><div class="settings-option"><label>Limpar dados</label><button id="btn-clear-data" style="padding:6px 14px; border:1px solid var(--danger-color); background:transparent; color:var(--danger-color); border-radius:6px; cursor:pointer; font-size:12px;">Limpar</button></div></div></div>`;
+    const winData = WindowManager.create('settings', 'Configurações', GlassIcons.settings, html, { width: 550, height: 620 });
+    
+    // Controles de som
+    const volumeSlider = winData.element.querySelector('#sound-volume-slider');
+    const btnMute = winData.element.querySelector('#btn-sound-mute');
+    const btnTest = winData.element.querySelector('#btn-test-sounds');
+    
+    if (volumeSlider) {
+        volumeSlider.addEventListener('input', (e) => {
+            SoundManager.init();
+            SoundManager.setVolume(e.target.value / 100);
+            if (btnMute) btnMute.textContent = SoundManager.isMuted ? 'Desmutar' : 'Mutuar';
+        });
+    }
+    
+    if (btnMute) {
+        btnMute.addEventListener('click', () => {
+            SoundManager.init();
+            const isMuted = SoundManager.toggleMute();
+            btnMute.textContent = isMuted ? 'Desmutar' : 'Mutuar';
+            if (volumeSlider) volumeSlider.value = Math.round(SoundManager.volume * 100);
+            // Atualizar ícone na taskbar também
+            GlassOS.updateSoundIcon(isMuted);
+        });
+    }
+    
+    if (btnTest) {
+        btnTest.addEventListener('click', () => {
+            SoundManager.init();
+            SoundManager.play('test');
+        });
+    }
+    
     winData.element.querySelector('[data-setting="theme"]').addEventListener('change', (e) => { ThemeManager.apply(e.target.value); });
     winData.element.querySelectorAll('.wallpaper-option').forEach(opt => { opt.addEventListener('click', () => { winData.element.querySelectorAll('.wallpaper-option').forEach(o => o.classList.remove('selected')); opt.classList.add('selected'); ThemeManager.applyWallpaper(opt.dataset.wallpaper); }); });
     winData.element.querySelector('#apply-custom-wallpaper').addEventListener('click', () => { const url = winData.element.querySelector('#custom-wallpaper-url').value.trim(); if (url) { winData.element.querySelectorAll('.wallpaper-option').forEach(o => o.classList.remove('selected')); ThemeManager.applyWallpaper(url); } });
@@ -1082,6 +1444,12 @@ const GlassOS = {
             LockScreen.lock();
         }, 500);
         
+        // Tocar som de boot após inicialização (se áudio já estiver disponível)
+        setTimeout(() => {
+            SoundManager.init();
+            SoundManager.play('boot');
+        }, 800);
+        
         console.log('GlassOS v1.1 inicializado com todas as funcionalidades.');
     },
     renderStaticIcons() {
@@ -1112,6 +1480,19 @@ const GlassOS = {
         document.getElementById('context-menu').addEventListener('click', (e) => { const item = e.target.closest('[data-action]'); if (!item) return; switch (item.dataset.action) { case 'refresh': location.reload(); break; case 'wallpaper': AppRegistry.open('settings'); break; case 'settings': AppRegistry.open('settings'); break; case 'widget': const type = prompt('Tipo de widget (clock, sysmon, weather):', 'clock'); if (type) WidgetSystem.create(type); break; case 'about': this.showAboutModal(); break; } });
         document.getElementById('btn-restart').addEventListener('click', () => { this.closeStartMenu(); this.shutdown('Reiniciando...'); });
         document.getElementById('btn-shutdown').addEventListener('click', () => { this.closeStartMenu(); this.shutdown('Desligando...'); });
+        
+        // Botão de som/mute na taskbar
+        const btnSoundToggle = document.getElementById('btn-sound-toggle');
+        if (btnSoundToggle) {
+            btnSoundToggle.addEventListener('click', () => {
+                SoundManager.init();
+                const isMuted = SoundManager.toggleMute();
+                this.updateSoundIcon(isMuted);
+            });
+            // Atualizar ícone inicial baseado no estado salvo
+            this.updateSoundIcon(SoundManager.isMuted);
+        }
+        
         document.addEventListener('mousemove', (e) => { WindowManager.handleDragMove(e); WindowManager.handleResizeMove(e); });
         document.addEventListener('mouseup', () => { WindowManager.handleDragEnd(); WindowManager.handleResizeEnd(); });
         document.addEventListener('keydown', (e) => {
@@ -1123,9 +1504,41 @@ const GlassOS = {
         });
         document.addEventListener('keyup', (e) => { if (e.key === 'Alt') this.hideAltTab(); });
     },
-    toggleStartMenu() { if (this.isStartOpen) this.closeStartMenu(); else this.openStartMenu(); },
-    openStartMenu() { document.getElementById('start-menu').classList.remove('hidden'); document.getElementById('btn-start').classList.add('active'); document.getElementById('start-search-input').value = ''; AppRegistry.renderStartMenu(''); this.isStartOpen = true; setTimeout(() => document.getElementById('start-search-input').focus(), 100); },
-    closeStartMenu() { document.getElementById('start-menu').classList.add('hidden'); document.getElementById('btn-start').classList.remove('active'); this.isStartOpen = false; },
+    
+    updateSoundIcon(isMuted) {
+        const iconMute = document.getElementById('sound-icon-mute');
+        const iconOn = document.getElementById('sound-icon-on');
+        if (iconMute && iconOn) {
+            if (isMuted) {
+                iconMute.style.display = 'block';
+                iconOn.style.display = 'none';
+            } else {
+                iconMute.style.display = 'none';
+                iconOn.style.display = 'block';
+            }
+        }
+    },
+    toggleStartMenu() { 
+        if (this.isStartOpen) this.closeStartMenu(); 
+        else this.openStartMenu(); 
+    },
+    openStartMenu() { 
+        // Tocar som de clique e inicializar áudio na primeira interação
+        SoundManager.init();
+        SoundManager.play('click');
+        
+        document.getElementById('start-menu').classList.remove('hidden'); 
+        document.getElementById('btn-start').classList.add('active'); 
+        document.getElementById('start-search-input').value = ''; 
+        AppRegistry.renderStartMenu(''); 
+        this.isStartOpen = true; 
+        setTimeout(() => document.getElementById('start-search-input').focus(), 100); 
+    },
+    closeStartMenu() { 
+        document.getElementById('start-menu').classList.add('hidden'); 
+        document.getElementById('btn-start').classList.remove('active'); 
+        this.isStartOpen = false; 
+    },
     showContextMenu(x, y) {
         const menu = document.getElementById('context-menu'); menu.classList.remove('hidden');
         const rect = menu.getBoundingClientRect();
