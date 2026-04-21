@@ -945,9 +945,14 @@ const LoginManager = {
         loginScreen.classList.add('slide-up');
         
         setTimeout(() => {
-            document.getElementById('desktop').classList.remove('hidden');
-            document.getElementById('taskbar').style.display = 'flex';
+            // Remove classes e garante visibilidade
+            document.getElementById('desktop').classList.remove('hidden-desktop');
+            document.getElementById('taskbar').classList.remove('hidden-taskbar');
             
+            // Garante que estão visíveis
+            document.getElementById('desktop').style.display = 'block';
+            document.getElementById('taskbar').style.display = 'flex';
+
             GlassOS.startSystem();
             this.cleanup();
         }, 800);
@@ -1980,9 +1985,13 @@ const BootManager = {
         const bootScreen = document.getElementById('boot-screen');
         const messagesContainer = document.getElementById('boot-messages');
         
-        // Esconde desktop e taskbar inicialmente
-        document.getElementById('desktop').style.display = 'none';
-        document.getElementById('taskbar').style.display = 'none';
+        // Esconde desktop e taskbar inicialmente (usando classes CSS)
+        // Esconde desktop e taskbar inicialmente (usando classes CSS)
+        document.getElementById('desktop').classList.add('hidden-desktop');
+        document.getElementById('taskbar').classList.add('hidden-taskbar');
+        // Esconde desktop e taskbar inicialmente (usando classes CSS)
+        document.getElementById('desktop').classList.add('hidden-desktop');
+        document.getElementById('taskbar').classList.add('hidden-taskbar');
         
         // Exibe mensagens de boot sequencialmente
         let msgIndex = 0;

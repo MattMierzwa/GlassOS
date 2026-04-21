@@ -1613,6 +1613,12 @@ body.light-mode .glass-panel { backdrop-filter: none; }
     pointer-events: none;
 }
 
+/* Esconder desktop e taskbar inicialmente */
+#desktop.hidden-desktop,
+#taskbar.hidden-taskbar {
+    display: none !important;
+}
+
 .boot-content {
     display: flex;
     flex-direction: column;
