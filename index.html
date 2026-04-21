@@ -16,8 +16,8 @@
 
     <div id="context-menu" class="glass-panel hidden">
         <div class="context-item" data-action="refresh">⟳ Atualizar</div>
-        <div class="context-item" data-action="wallpaper">🖼️ Alterar Papel de Parede</div>
-        <div class="context-item" data-action="settings">⚙️ Configurações</div>
+        <div class="context-item" data-action="wallpaper"><span id="ctx-wallpaper-icon"></span> Alterar Papel de Parede</div>
+        <div class="context-item" data-action="settings"><span id="ctx-settings-icon"></span> Configurações</div>
         <div class="context-item" data-action="widget">➕ Adicionar Widget</div>
         <div class="context-divider"></div>
         <div class="context-item" data-action="about">ℹ️ Sobre o GlassOS</div>
@@ -66,7 +66,7 @@
 
     <div id="notification-center" class="glass-panel hidden">
         <div class="notification-header">
-            <h3>🔔 Notificações</h3>
+            <h3><span id="notif-header-icon"></span> Notificações</h3>
             <button id="notif-clear-all">Limpar tudo</button>
         </div>
         <div id="notification-list"></div>
@@ -77,7 +77,7 @@
 
     <div id="clipboard-manager" class="glass-panel hidden">
         <div class="clipboard-header">
-            <h3>📋 Área de Transferência</h3>
+            <h3><span id="clipboard-header-icon"></span> Área de Transferência</h3>
             <button id="clipboard-clear">Limpar</button>
         </div>
         <div id="clipboard-list"></div>
@@ -123,8 +123,8 @@
         </button>
         <div id="taskbar-apps"></div>
         <div id="taskbar-tray">
-            <span id="tray-clipboard" title="Área de Transferência">📋</span>
-            <span id="tray-notifications" title="Notificações">🔔</span>
+            <span id="tray-clipboard" title="Área de Transferência"></span>
+            <span id="tray-notifications" title="Notificações"></span>
             <span id="tray-clock"></span>
             <span id="tray-date"></span>
         </div>
