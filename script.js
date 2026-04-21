@@ -303,6 +303,170 @@ const SoundManager = {
     }
 };
 
+// ===== TEMAS SONOROS (SOUND SCHEMES) =====
+const SoundThemes = {
+    currentTheme: 'glass',
+    
+    themes: {
+        glass: {
+            click: () => SoundManager._playClick(SoundManager.ctx.currentTime),
+            openWindow: () => SoundManager._playOpenWindow(SoundManager.ctx.currentTime),
+            closeWindow: () => SoundManager._playCloseWindow(SoundManager.ctx.currentTime),
+            minimize: () => SoundManager._playMinimize(SoundManager.ctx.currentTime),
+            notification: () => SoundManager._playNotification(SoundManager.ctx.currentTime),
+            error: () => SoundManager._playError(SoundManager.ctx.currentTime),
+            typing: () => SoundManager._playTyping(SoundManager.ctx.currentTime)
+        },
+        mechanical: {
+            click: () => SoundThemes._playTone('square', 800, 0.05, 0.1),
+            openWindow: () => SoundThemes._playTone('sawtooth', 200, 0.2, 0.15, true),
+            closeWindow: () => SoundThemes._playTone('sawtooth', 150, 0.15, 0.12, false, true),
+            minimize: () => SoundThemes._playTone('square', 400, 0.08, 0.1, false, true),
+            notification: () => SoundThemes._playTone('square', 1200, 0.1, 0.2),
+            error: () => SoundThemes._playTone('sawtooth', 100, 0.3, 0.2),
+            typing: () => SoundThemes._playTone('square', 600, 0.02, 0.05)
+        },
+        scifi: {
+            click: () => SoundThemes._playTone('sine', 2000, 0.03, 0.08),
+            openWindow: () => SoundThemes._playSweep(300, 800, 0.3),
+            closeWindow: () => SoundThemes._playSweep(800, 300, 0.25),
+            minimize: () => SoundThemes._playTone('triangle', 600, 0.1, 0.1),
+            notification: () => SoundThemes._playArpeggio([880, 1100, 1320], 0.1),
+            error: () => SoundThemes._playTone('sawtooth', 150, 0.4, 0.25),
+            typing: () => SoundThemes._playTone('sine', 1500, 0.02, 0.05)
+        },
+        nature: {
+            click: () => SoundThemes._playTone('sine', 1800, 0.04, 0.1),
+            openWindow: () => SoundThemes._playChime([523.25, 659.25, 783.99], 0.3),
+            closeWindow: () => SoundThemes._playChime([783.99, 659.25, 523.25], 0.25),
+            minimize: () => SoundThemes._playTone('sine', 880, 0.08, 0.1),
+            notification: () => SoundThemes._playBirdChirp(),
+            error: () => SoundThemes._playTone('triangle', 200, 0.3, 0.2),
+            typing: () => SoundThemes._playTone('sine', 2000, 0.015, 0.05)
+        },
+        silent: {
+            click: () => {},
+            openWindow: () => {},
+            closeWindow: () => {},
+            minimize: () => {},
+            notification: () => {},
+            error: () => {},
+            typing: () => {}
+        }
+    },
+    
+    _playTone(type, freq, duration, vol = 0.1, sweepDown = false, sweepUp = false) {
+        if (!SoundManager.initialized || SoundManager.isMuted) return;
+        const ctx = SoundManager.ctx;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        if (sweepDown) osc.frequency.exponentialRampToValueAtTime(freq / 2, ctx.currentTime + duration);
+        if (sweepUp) osc.frequency.exponentialRampToValueAtTime(freq * 2, ctx.currentTime + duration);
+        
+        gain.gain.setValueAtTime(vol, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        
+        osc.connect(gain);
+        gain.connect(SoundManager.masterGain);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+    },
+    
+    _playSweep(fromFreq, toFreq, duration) {
+        if (!SoundManager.initialized || SoundManager.isMuted) return;
+        const ctx = SoundManager.ctx;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(fromFreq, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(toFreq, ctx.currentTime + duration);
+        
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        
+        osc.connect(gain);
+        gain.connect(SoundManager.masterGain);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+    },
+    
+    _playArpeggio(frequencies, noteDuration) {
+        if (!SoundManager.initialized || SoundManager.isMuted) return;
+        frequencies.forEach((freq, i) => {
+            setTimeout(() => SoundThemes._playTone('sine', freq, noteDuration, 0.15), i * 80);
+        });
+    },
+    
+    _playChime(frequencies, duration) {
+        if (!SoundManager.initialized || SoundManager.isMuted) return;
+        const ctx = SoundManager.ctx;
+        frequencies.forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.1);
+            gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + i * 0.1 + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration + i * 0.1);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start(ctx.currentTime + i * 0.1);
+            osc.stop(ctx.currentTime + duration + i * 0.1 + 0.1);
+        });
+    },
+    
+    _playBirdChirp() {
+        if (!SoundManager.initialized || SoundManager.isMuted) return;
+        const ctx = SoundManager.ctx;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(2000, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(3000, ctx.currentTime + 0.1);
+        osc.frequency.linearRampToValueAtTime(2500, ctx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(SoundManager.masterGain);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+    },
+    
+    setTheme(themeName) {
+        if (this.themes[themeName]) {
+            this.currentTheme = themeName;
+            Storage.set('soundTheme', themeName);
+        }
+    },
+    
+    play(eventType) {
+        if (!this.themes[this.currentTheme] || !this.themes[this.currentTheme][eventType]) return;
+        if (this.currentTheme === 'silent') return;
+        this.themes[this.currentTheme][eventType]();
+    }
+};
+
+// Carregar tema sonoro salvo
+(function loadSoundTheme() {
+    const savedTheme = Storage.get('soundTheme', 'glass');
+    SoundThemes.setTheme(savedTheme);
+})();
+
+// Sobrescrever o método play do SoundManager para usar temas
+const originalSoundManagerPlay = SoundManager.play.bind(SoundManager);
+SoundManager.play = function(soundName) {
+    if (SoundThemes.currentTheme !== 'glass') {
+        SoundThemes.play(soundName);
+    } else {
+        originalSoundManagerPlay(soundName);
+    }
+};
+
 // Carregar configurações de áudio salvas
 (function loadAudioSettings() {
     const savedVol = localStorage.getItem('glassos_volume');
@@ -501,6 +665,17 @@ const WindowManager = {
         winEl.addEventListener('mousedown', () => this.focus(winData.id));
         btnMin.addEventListener('click', (e) => { e.stopPropagation(); this.minimize(winData.id); });
         btnMax.addEventListener('click', (e) => { e.stopPropagation(); this.toggleMaximize(winData.id); });
+        // Hover no botão maximizar para mostrar popup de snap
+        btnMax.addEventListener('mouseenter', (e) => {
+            if (typeof SnapManager !== 'undefined') {
+                SnapManager.showPopup(btnMax, winData.id);
+            }
+        });
+        btnMax.addEventListener('mouseleave', () => {
+            if (typeof SnapManager !== 'undefined') {
+                setTimeout(() => SnapManager.hidePopup(), 200);
+            }
+        });
         btnClose.addEventListener('click', (e) => { e.stopPropagation(); this.close(winData.id); });
 
         titlebar.addEventListener('mousedown', (e) => {
@@ -1149,45 +1324,327 @@ const PerformanceOptimizer = {
     decompress(compressed) { try { return JSON.parse(atob(compressed)); } catch { return null; } }
 };
 
-// ===== SNAP LAYOUTS =====
-const SnapLayouts = {
-    activeWindow: null, overlay: null,
-    init() { this.createOverlay(); this.setupEvents(); },
+// ===== SNAP LAYOUTS AVANÇADO (WINDOWS 11 STYLE) =====
+const SnapManager = {
+    activeWindow: null,
+    overlay: null,
+    popupMenu: null,
+    previewZone: null,
+    
+    zones: ['left', 'right', 'top-left', 'top-right', 'bottom-left', 'bottom-right', 'maximize'],
+    
+    init() {
+        this.createOverlay();
+        this.setupEvents();
+    },
+    
     createOverlay() {
         this.overlay = document.getElementById('snap-overlay');
         this.overlay.querySelectorAll('.snap-zone').forEach(zone => {
             zone.addEventListener('click', () => {
-                if (this.activeWindow) { this.applySnap(this.activeWindow, zone.dataset.layout); }
-                this.hide();
+                if (this.activeWindow) {
+                    this.applySnap(this.activeWindow, zone.dataset.layout);
+                }
+                this.hidePreview();
             });
         });
     },
-    show(winElement) { this.activeWindow = winElement; this.overlay.classList.add('active'); },
-    hide() { this.overlay.classList.remove('active'); this.activeWindow = null; },
-    applySnap(winElement, layout) {
-        const taskbarHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--taskbar-height'));
-        const winData = Array.from(WindowManager.windows.values()).find(w => w.element === winElement);
+    
+    showPreview(winId, zone) {
+        const winData = WindowManager.windows.get(winId);
         if (!winData) return;
-        WindowManager.toggleMaximize(winData.id);
-        const width = window.innerWidth / 2 - 4, height = window.innerHeight - taskbarHeight - 8;
-        if (layout === 'half-left') { winElement.style.left = '4px'; winElement.style.top = '4px'; winElement.style.width = `${width}px`; winElement.style.height = `${height}px`; }
-        else if (layout === 'half-right') { winElement.style.left = `${window.innerWidth / 2 + 4}px`; winElement.style.top = '4px'; winElement.style.width = `${width}px`; winElement.style.height = `${height}px`; }
+        
+        this.activeWindow = winId;
+        this.overlay.classList.add('active');
+        
+        // Mostrar preview visual
+        this.overlay.querySelectorAll('.snap-zone').forEach(z => {
+            z.style.opacity = z.dataset.layout === zone ? '1' : '0.3';
+        });
     },
+    
+    hidePreview() {
+        this.overlay.classList.remove('active');
+        this.overlay.querySelectorAll('.snap-zone').forEach(z => z.style.opacity = '1');
+        this.activeWindow = null;
+    },
+    
+    applySnap(winId, layout) {
+        const winData = WindowManager.windows.get(winId);
+        if (!winData) return;
+        
+        const taskbarHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--taskbar-height'));
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight - taskbarHeight;
+        
+        let left, top, width, height;
+        
+        switch(layout) {
+            case 'half-left':
+                left = 4; top = 4; width = screenWidth / 2 - 8; height = screenHeight - 8;
+                break;
+            case 'half-right':
+                left = screenWidth / 2 + 4; top = 4; width = screenWidth / 2 - 8; height = screenHeight - 8;
+                break;
+            case 'maximize':
+                left = 0; top = 0; width = screenWidth; height = screenHeight;
+                break;
+        }
+        
+        winData.element.style.left = `${left}px`;
+        winData.element.style.top = `${top}px`;
+        winData.element.style.width = `${width}px`;
+        winData.element.style.height = `${height}px`;
+        winData.element.classList.remove('maximized');
+        winData.maximized = false;
+    },
+    
     setupEvents() {
         let dragTimeout;
+        let edgeZone = null;
+        
         document.addEventListener('mousemove', (e) => {
             if (WindowManager.dragState) {
                 clearTimeout(dragTimeout);
                 dragTimeout = setTimeout(() => {
                     const winData = WindowManager.windows.get(WindowManager.dragState.winId);
                     if (!winData) return;
-                    if (e.clientY < 20) this.show(winData.element); else this.hide();
-                }, 500);
+                    
+                    const nearTop = e.clientY < 20;
+                    const nearLeft = e.clientX < 20;
+                    const nearRight = e.clientX > window.innerWidth - 20;
+                    
+                    let newZone = null;
+                    if (nearTop && nearLeft) newZone = 'top-left';
+                    else if (nearTop && nearRight) newZone = 'top-right';
+                    else if (nearLeft) newZone = 'left';
+                    else if (nearRight) newZone = 'right';
+                    else if (nearTop) newZone = 'maximize';
+                    
+                    if (newZone && newZone !== edgeZone) {
+                        edgeZone = newZone;
+                        this.showPreview(winData.id, newZone);
+                    } else if (!newZone && edgeZone) {
+                        edgeZone = null;
+                        this.hidePreview();
+                    }
+                }, 300);
             }
         });
-        document.addEventListener('mouseup', () => { clearTimeout(dragTimeout); this.hide(); });
+        
+        document.addEventListener('mouseup', () => {
+            clearTimeout(dragTimeout);
+            if (this.activeWindow) {
+                const zone = this.overlay.querySelector('.snap-zone[style*="opacity: 1"]');
+                if (zone) {
+                    this.applySnap(this.activeWindow, zone.dataset.layout);
+                }
+            }
+            this.hidePreview();
+            edgeZone = null;
+        });
+    },
+    
+    // Popup no hover do botão maximizar
+    showPopup(btnMaximize, winId) {
+        const container = document.getElementById('snap-popup-container');
+        container.innerHTML = '';
+        
+        const popup = document.createElement('div');
+        popup.className = 'snap-popup-menu';
+        popup.innerHTML = `
+            <div class="snap-popup-item" data-layout="half-left" title="Esquerda">${this._getLayoutIcon('left')}</div>
+            <div class="snap-popup-item" data-layout="maximize" title="Maximizar">${this._getLayoutIcon('maximize')}</div>
+            <div class="snap-popup-item" data-layout="half-right" title="Direita">${this._getLayoutIcon('right')}</div>
+        `;
+        
+        const rect = btnMaximize.getBoundingClientRect();
+        popup.style.left = `${rect.left - 60}px`;
+        popup.style.top = `${rect.bottom + 5}px`;
+        
+        popup.querySelectorAll('.snap-popup-item').forEach(item => {
+            item.addEventListener('click', () => {
+                this.applySnap(winId, item.dataset.layout);
+                this.hidePopup();
+                SoundManager.play('click');
+            });
+        });
+        
+        container.appendChild(popup);
+        this.popupMenu = popup;
+    },
+    
+    hidePopup() {
+        const container = document.getElementById('snap-popup-container');
+        container.innerHTML = '';
+        this.popupMenu = null;
+    },
+    
+    _getLayoutIcon(layout) {
+        if (layout === 'left') return '<svg viewBox="0 0 24 24"><rect x="2" y="4" width="9" height="16" rx="1"/></svg>';
+        if (layout === 'right') return '<svg viewBox="0 0 24 24"><rect x="13" y="4" width="9" height="16" rx="1"/></svg>';
+        if (layout === 'maximize') return '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>';
+        return '';
     }
 };
+
+// ===== ENGINE DE PARTÍCULAS DO MOUSE =====
+const ParticleEngine = {
+    canvas: null,
+    ctx: null,
+    particles: [],
+    enabled: false,
+    particleType: 'sparkle',
+    animationId: null,
+    
+    init() {
+        this.canvas = document.getElementById('particle-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.resize();
+        
+        this.enabled = Storage.get('particlesEnabled', false);
+        this.particleType = Storage.get('particleType', 'sparkle');
+        
+        window.addEventListener('resize', () => this.resize());
+        
+        if (this.enabled) {
+            this.start();
+        }
+    },
+    
+    resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    },
+    
+    start() {
+        this.enabled = true;
+        Storage.set('particlesEnabled', true);
+        if (!this.animationId) {
+            this.animate();
+        }
+    },
+    
+    stop() {
+        this.enabled = false;
+        Storage.set('particlesEnabled', false);
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+            this.animationId = null;
+        }
+        this.particles = [];
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    },
+    
+    setParticleType(type) {
+        this.particleType = type;
+        Storage.set('particleType', type);
+    },
+    
+    spawn(x, y, type = null) {
+        if (!this.enabled || PerformanceOptimizer.mode === 'light') return;
+        
+        const particleType = type || this.particleType;
+        const count = particleType === 'matrix' ? 3 : 1;
+        
+        for (let i = 0; i < count; i++) {
+            this.particles.push(new Particle(x, y, particleType));
+        }
+    },
+    
+    animate() {
+        if (!this.enabled) return;
+        
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            const p = this.particles[i];
+            p.update();
+            p.draw(this.ctx);
+            
+            if (p.life <= 0) {
+                this.particles.splice(i, 1);
+            }
+        }
+        
+        this.animationId = requestAnimationFrame(() => this.animate());
+    }
+};
+
+class Particle {
+    constructor(x, y, type) {
+        this.x = x;
+        this.y = y;
+        this.type = type;
+        this.life = 1;
+        this.decay = Math.random() * 0.02 + 0.02;
+        
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 2 + 1;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        
+        this.size = Math.random() * 4 + 2;
+        
+        if (type === 'sparkle') {
+            this.color = `hsl(${Math.random() * 60 + 180}, 100%, 70%)`;
+        } else if (type === 'star') {
+            this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+        } else if (type === 'matrix') {
+            this.color = '#0f0';
+            this.char = String.fromCharCode(0x30A0 + Math.random() * 96);
+        } else {
+            this.color = '#ffffff';
+        }
+    }
+    
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.1; // gravidade suave
+        this.life -= this.decay;
+    }
+    
+    draw(ctx) {
+        ctx.globalAlpha = this.life;
+        
+        if (this.type === 'matrix') {
+            ctx.fillStyle = this.color;
+            ctx.font = '12px monospace';
+            ctx.fillText(this.char, this.x, this.y);
+        } else if (this.type === 'star') {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+                const x = this.x + Math.cos(angle) * this.size;
+                const y = this.y + Math.sin(angle) * this.size;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+        } else {
+            // sparkle default
+            const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+            gradient.addColorStop(0, this.color);
+            gradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        ctx.globalAlpha = 1;
+    }
+}
+
+// Listener global para partículas
+document.addEventListener('mousemove', (e) => {
+    if (ParticleEngine.enabled && PerformanceOptimizer.mode !== 'light') {
+        ParticleEngine.spawn(e.clientX, e.clientY);
+    }
+});
 
 // ===== PICTURE-IN-PICTURE MODE =====
 const PiPMode = {
@@ -1558,7 +2015,8 @@ const GlassOS = {
         WidgetSystem.init();
         UpdateSystem.init();
         PerformanceOptimizer.init();
-        SnapLayouts.init();
+        SnapManager.init();
+        ParticleEngine.init();
         
         // Inicializar QuickSettingsManager
         QuickSettingsManager.init();

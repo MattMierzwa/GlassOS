@@ -152,6 +152,9 @@
     <!-- Overlay de Brilho (simulação) -->
     <div id="brightness-overlay"></div>
 
+    <!-- Canvas para partículas do mouse -->
+    <canvas id="particle-canvas"></canvas>
+
     <!-- Painel de Configurações Rápidas -->
     <div id="quick-settings-panel" class="glass-panel hidden">
         <div class="qs-header">
@@ -216,6 +219,9 @@
         <div class="snap-zone half-left" data-layout="half-left"></div>
         <div class="snap-zone half-right" data-layout="half-right"></div>
     </div>
+
+    <!-- Popup de Snap Assist (gerado dinamicamente, mas container existe) -->
+    <div id="snap-popup-container"></div>
 
     <div id="taskbar">
         <button id="btn-start" title="Menu Iniciar">
