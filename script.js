@@ -939,23 +939,48 @@ const LoginManager = {
     },
 
     loginSuccess() {
+        console.log('✅ LOGIN BEM-SUCEDIDO!');
+        
+        // Toca som de sucesso
         SoundManager.play('openWindow');
         
         const loginScreen = document.getElementById('login-screen');
+        const desktop = document.getElementById('desktop');
+        const taskbar = document.getElementById('taskbar');
+        
+        console.log('📱 Adicionando classe slide-up...');
         loginScreen.classList.add('slide-up');
         
+        // Remove as classes que escondem desktop e taskbar IMEDIATAMENTE
+        console.log('🖥️ Removendo classes hidden...');
+        if (desktop) {
+            desktop.classList.remove('hidden-desktop');
+            desktop.style.display = 'block';
+            console.log('✅ Desktop visível');
+        }
+        
+        if (taskbar) {
+            taskbar.classList.remove('hidden-taskbar');
+            taskbar.style.display = 'flex';
+            console.log('✅ Taskbar visível');
+        }
+        
+        // Aguarda a animação terminar e inicia o sistema
         setTimeout(() => {
-            // Remove classes e garante visibilidade
-            document.getElementById('desktop').classList.remove('hidden-desktop');
-            document.getElementById('taskbar').classList.remove('hidden-taskbar');
+            console.log('⏰ Timeout completado, iniciando sistema...');
             
-            // Garante que estão visíveis
-            document.getElementById('desktop').style.display = 'block';
-            document.getElementById('taskbar').style.display = 'flex';
-
+            // Garante que login-screen está escondido adicionando classe extra
+            loginScreen.classList.add('animation-complete');
+            loginScreen.style.display = 'none';
+            
+            // Inicia o sistema
             GlassOS.startSystem();
+            
+            // Limpa o LoginManager
             this.cleanup();
-        }, 800);
+            
+            console.log('🚀 Sistema iniciado com sucesso!');
+        }, 850);
     },
 
     loginFailed() {
@@ -984,12 +1009,17 @@ const LoginManager = {
 
     showLoginScreen() {
         const loginScreen = document.getElementById('login-screen');
-        loginScreen.classList.remove('hidden');
+        console.log('🔓 Mostrando tela de login...');
+        
+        loginScreen.classList.remove('hidden', 'slide-up', 'animation-complete');
         loginScreen.style.opacity = '0';
+        loginScreen.style.display = 'flex';
         
         setTimeout(() => {
             loginScreen.style.transition = 'opacity 0.8s ease-in-out';
             loginScreen.style.opacity = '1';
+            loginScreen.classList.add('visible');
+            console.log('✅ Tela de login visível');
         }, 100);
     },
 
