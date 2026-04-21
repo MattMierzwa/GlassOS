@@ -702,23 +702,61 @@ const FileSystem = {
 
 // ===== SISTEMA DE NOTIFICAÇÕES =====
 const NotificationSystem = {
-    notifications: [], focusMode: false,
+    notifications: [], 
+    focusMode: false,
+    
+    init() {
+        // Carregar estado do foco do localStorage
+        const savedFocus = localStorage.getItem('glassos_focus_mode');
+        if (savedFocus === 'true') {
+            this.focusMode = true;
+            document.body.classList.add('focus-mode');
+        }
+        this.render();
+        this.updateBadge();
+    },
+    
     show(title, message, type = 'info', duration = 5000) {
-        if (this.focusMode && type !== 'urgent') return;
+        // Se estiver em modo foco e não for urgente, apenas adiciona ao centro (sem toast)
+        if (this.focusMode && type !== 'urgent') {
+            const id = Date.now();
+            this.notifications.unshift({ id, title, message, type, time: new Date() });
+            this.render();
+            this.updateBadge();
+            if (duration > 0) setTimeout(() => this.dismiss(id), duration);
+            return id;
+        }
+        
         const id = Date.now();
         this.notifications.unshift({ id, title, message, type, time: new Date() });
-        this.render(); this.showToast(title, message, type); this.updateBadge();
+        this.render(); 
+        this.showToast(title, message, type); 
+        this.updateBadge();
         if (duration > 0) setTimeout(() => this.dismiss(id), duration);
         return id;
     },
-    dismiss(id) { this.notifications = this.notifications.filter(n => n.id !== id); this.render(); this.updateBadge(); },
-    clearAll() { this.notifications = []; this.render(); this.updateBadge(); },
+    
+    dismiss(id) { 
+        this.notifications = this.notifications.filter(n => n.id !== id); 
+        this.render(); 
+        this.updateBadge(); 
+    },
+    
+    clearAll() { 
+        this.notifications = []; 
+        this.render(); 
+        this.updateBadge(); 
+    },
+    
     toggleFocusMode() {
         this.focusMode = !this.focusMode;
         document.body.classList.toggle('focus-mode', this.focusMode);
         document.getElementById('notif-focus-mode')?.classList.toggle('active', this.focusMode);
+        // Salvar no localStorage
+        localStorage.setItem('glassos_focus_mode', this.focusMode.toString());
         this.show('Modo Foco', this.focusMode ? 'Notificações silenciadas' : 'Notificações ativadas', 'info', 3000);
     },
+    
     render() {
         const list = document.getElementById('notification-list');
         if (!list) return;
@@ -737,14 +775,18 @@ const NotificationSystem = {
             item.addEventListener('click', () => this.dismiss(parseInt(item.dataset.id)));
         });
     },
+    
     updateBadge() {
         const count = this.notifications.length;
         const badge = document.getElementById('tray-notifications');
         if (badge) badge.innerHTML = count > 0 ? renderIcon('notifications', 16) + `<span style="margin-left:4px">${count}</span>` : renderIcon('notifications', 16);
     },
+    
     showToast(title, message, type) {
-        // Tocar som de notificação
-        SoundManager.play('notification');
+        // Tocar som de notificação (se SoundManager estiver disponível)
+        if (typeof SoundManager !== 'undefined') {
+            try { SoundManager.play('notification'); } catch(e) {}
+        }
         
         const container = document.getElementById('toast-container');
         if (!container) return;
@@ -757,10 +799,13 @@ const NotificationSystem = {
         };
         const toast = document.createElement('div');
         toast.className = 'toast';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'polite');
         toast.innerHTML = `<span class="toast-icon">${icons[type] || icons.info}</span><div class="toast-content"><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div>`;
         container.appendChild(toast);
         setTimeout(() => { toast.classList.add('hiding'); setTimeout(() => toast.remove(), 300); }, 4000);
     },
+    
     setupEvents() {
         const notifBtn = document.getElementById('tray-notifications');
         const center = document.getElementById('notification-center');
@@ -862,38 +907,102 @@ const GlobalSearch = {
     }
 };
 
-// ===== TELA DE BLOQUEIO =====
-const LockScreen = {
-    password: '1234', isLocked: false,
-    init() { this.setupEvents(); this.updateClock(); setInterval(() => this.updateClock(), 1000); },
-    lock() {
-        this.isLocked = true;
-        document.getElementById('lock-screen').classList.remove('hidden');
-        document.getElementById('lock-password').value = '';
-        document.getElementById('lock-error').classList.add('hidden');
-        NotificationSystem.show('Sistema Bloqueado', 'Digite a senha para desbloquear', 'info', 0);
+// ===== TELA DE LOGIN (NOVA IMPLEMENTAÇÃO) =====
+const LoginScreen = {
+    password: '1234',
+    
+    init() { 
+        this.setupEvents(); 
+        this.updateClock(); 
+        setInterval(() => this.updateClock(), 1000); 
     },
-    unlock(password) {
+    
+    show() {
+        document.getElementById('login-screen').classList.remove('hidden');
+        document.getElementById('login-password').value = '';
+        document.getElementById('login-error').classList.add('hidden');
+        this.updateClock();
+    },
+    
+    hide() {
+        document.getElementById('login-screen').classList.add('hidden');
+    },
+    
+    authenticate(password) {
         if (password === this.password) {
-            this.isLocked = false;
-            document.getElementById('lock-screen').classList.add('hidden');
-            NotificationSystem.show('Sistema Desbloqueado', 'Bem-vindo de volta!', 'success', 3000);
-        } else { document.getElementById('lock-error').classList.remove('hidden'); setTimeout(() => document.getElementById('lock-error').classList.add('hidden'), 3000); }
+            // Sucesso no login
+            this.hide();
+            
+            // Revelar desktop e taskbar
+            document.getElementById('desktop').classList.remove('hidden');
+            document.getElementById('taskbar').classList.remove('hidden');
+            
+            // Notificações de sucesso
+            NotificationSystem.show('Login realizado com sucesso', 'Bem-vindo ao GlassOS!', 'success', 4000);
+            
+            setTimeout(() => {
+                NotificationSystem.show('GlassOS', 'Sistema iniciado. Bem-vindo!', 'info', 5000);
+            }, 800);
+            
+            return true;
+        } else { 
+            // Erro na autenticação
+            const errorEl = document.getElementById('login-error');
+            errorEl.classList.remove('hidden');
+            
+            // Shake animation reset
+            errorEl.style.animation = 'none';
+            errorEl.offsetHeight; // trigger reflow
+            errorEl.style.animation = 'shake 0.5s';
+            
+            NotificationSystem.show('Falha na autenticação', 'Senha incorreta. Tente novamente.', 'error', 3000);
+            
+            setTimeout(() => errorEl.classList.add('hidden'), 3000);
+            return false;
+        }
     },
+    
     updateClock() {
-        const clock = document.getElementById('lock-clock'); const date = document.getElementById('lock-date');
+        const clock = document.getElementById('login-clock');
+        const date = document.getElementById('login-date');
         if (!clock || !date) return;
+        
         const now = new Date();
         clock.textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         date.textContent = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     },
+    
     setupEvents() {
-        document.getElementById('lock-unlock')?.addEventListener('click', () => { const pwd = document.getElementById('lock-password').value; this.unlock(pwd); });
-        document.getElementById('lock-password')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') this.unlock(e.target.value); });
-        document.getElementById('lock-shutdown')?.addEventListener('click', () => GlassOS.shutdown('Desligando...'));
-        let idleTimer;
-        const resetTimer = () => { clearTimeout(idleTimer); if (!this.isLocked) idleTimer = setTimeout(() => this.lock(), 300000); };
-        document.addEventListener('mousemove', resetTimer); document.addEventListener('keypress', resetTimer); document.addEventListener('click', resetTimer); resetTimer();
+        // Botão de entrar
+        document.getElementById('login-submit')?.addEventListener('click', () => {
+            const pwd = document.getElementById('login-password').value;
+            this.authenticate(pwd);
+        });
+        
+        // Enter no input de senha
+        document.getElementById('login-password')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.authenticate(e.target.value);
+            }
+        });
+        
+        // Foco automático no input de senha
+        document.getElementById('login-password')?.focus();
+        
+        // Botão de desligar
+        document.getElementById('login-power')?.addEventListener('click', () => {
+            GlassOS.shutdown('Desligando...');
+        });
+        
+        // Botão de acessibilidade (placeholder)
+        document.getElementById('login-accessibility')?.addEventListener('click', () => {
+            NotificationSystem.show('Acessibilidade', 'Opções de acessibilidade em desenvolvimento', 'info', 2000);
+        });
+        
+        // Botão de rede (placeholder)
+        document.getElementById('login-network')?.addEventListener('click', () => {
+            NotificationSystem.show('Rede', 'Configurações de rede em desenvolvimento', 'info', 2000);
+        });
     }
 };
 
@@ -1241,10 +1350,16 @@ Apps.Terminal = function() {
         print(`user@glassos:~$ ${trimmed}`); commandHistory.unshift(trimmed); if (commandHistory.length > 50) commandHistory.pop(); historyIndex = -1;
         const parts = trimmed.split(/\s+/), command = parts[0].toLowerCase(), args = parts.slice(1);
         switch (command) {
-            case 'help': print('Comandos: help, clear, date, echo, ls, theme, sysinfo, reboot, calc, whoami, history, neofetch, lock, perf', 'cmd-info'); break;
+            case 'help': print('Comandos: help, clear, date, echo, ls, theme, sysinfo, reboot, calc, whoami, history, neofetch, lock, perf, notify', 'cmd-info'); break;
             case 'clear': output.innerHTML = ''; break;
             case 'date': print(new Date().toLocaleString('pt-BR')); break;
             case 'echo': print(args.join(' ')); break;
+            case 'notify': { 
+                const text = args.join(' '); 
+                if (!text) { print('Uso: notify <mensagem>', 'cmd-error'); } 
+                else { NotificationSystem.show('Terminal', text, 'info', 5000); print('Notificação enviada!', 'cmd-success'); } 
+                break; 
+            }
             case 'ls': { const fs = FileSystem.getFS(); const path = args[0] || '/'; const node = FileSystem.getNode(fs, path); if (!node || node.type !== 'folder') { print(`ls: ${path}: Não existe`, 'cmd-error'); } else { const entries = Object.entries(node.children || {}); if (entries.length === 0) print('(vazio)'); else entries.forEach(([name, item]) => { const prefix = item.type === 'folder' ? renderIcon('files', 16) : renderIcon('clipboard', 16); print(`${prefix} ${name}`); }); } break; }
             case 'theme': { const theme = args[0]?.toLowerCase(); if (['dark', 'light', 'glass', 'retro', 'cyberpunk'].includes(theme)) { ThemeManager.apply(theme); print(`Tema: ${theme}`, 'cmd-info'); } else print('Uso: theme [dark|light|glass|retro|cyberpunk]', 'cmd-error'); break; }
             case 'sysinfo': print('GlassOS v1.1', 'cmd-info'); print(`Navegador: ${navigator.userAgent.split(' ').slice(-1)[0]}`); print(`Tema: ${document.documentElement.getAttribute('data-theme')}`); print(`Janelas: ${WindowManager.windows.size}`); break;
@@ -1253,7 +1368,7 @@ Apps.Terminal = function() {
             case 'whoami': print('user'); break;
             case 'history': commandHistory.forEach((cmd, i) => { print(`  ${commandHistory.length - i}  ${cmd}`); }); break;
             case 'neofetch': print(`\n    ╔══════════════╗   user@glassos\n    ║   GlassOS  ║   OS: GlassOS v1.1\n    ║     v1.1    ║   Theme: ${document.documentElement.getAttribute('data-theme')}\n    ╚══════════════╝   Windows: ${WindowManager.windows.size}\n                `, 'cmd-info'); break;
-            case 'lock': LockScreen.lock(); break;
+            case 'lock': LoginScreen.show(); break;
             case 'perf': PerformanceOptimizer.toggleLightMode(); print(`Modo performance: ${PerformanceOptimizer.mode}`, 'cmd-info'); break;
             default: print(`Comando nao encontrado: ${command}. Digite "help".`, 'cmd-error');
         }
@@ -1420,7 +1535,12 @@ const AppRegistry = {
 // ===== SISTEMA PRINCIPAL =====
 const GlassOS = {
     isStartOpen: false, isShutdown: false, altTabSelected: 0,
+    
     init() {
+        // Esconder desktop e taskbar inicialmente (serão revelados após login)
+        document.getElementById('desktop').classList.add('hidden');
+        document.getElementById('taskbar').classList.add('hidden');
+        
         const settings = ThemeManager.getSettings();
         ThemeManager.apply(settings.theme);
         ThemeManager.applyWallpaper(settings.wallpaper);
@@ -1430,10 +1550,11 @@ const GlassOS = {
         this.setupGlobalEvents();
         // Inicializar novos sistemas e renderizar ícones SVG nos elementos do HTML
         this.renderStaticIcons();
+        NotificationSystem.init();
         NotificationSystem.setupEvents();
         ClipboardManager.init();
         GlobalSearch.init();
-        LockScreen.init();
+        LoginScreen.init();
         WidgetSystem.init();
         UpdateSystem.init();
         PerformanceOptimizer.init();
@@ -1442,19 +1563,51 @@ const GlassOS = {
         // Inicializar QuickSettingsManager
         QuickSettingsManager.init();
         
-        // Mostrar tela de login/bloqueio imediatamente ao iniciar o sistema
-        setTimeout(() => {
-            LockScreen.lock();
-        }, 500);
+        // Iniciar sequência de boot
+        this.runBootSequence();
         
-        // Tocar som de boot após inicialização (se áudio já estiver disponível)
-        setTimeout(() => {
-            SoundManager.init();
-            SoundManager.play('boot');
-        }, 800);
-        
-        console.log('GlassOS v1.1 inicializado com todas as funcionalidades.');
+        console.log('GlassOS inicializado com todas as funcionalidades.');
     },
+    
+    runBootSequence() {
+        const messages = [
+            { text: 'GlassOS BIOS v1.0', type: 'info', delay: 200 },
+            { text: 'Checking memory... OK', type: 'ok', delay: 500 },
+            { text: 'Initializing CPU... OK', type: 'ok', delay: 800 },
+            { text: 'Loading kernel... OK', type: 'ok', delay: 1200 },
+            { text: 'Mounting filesystem... OK', type: 'ok', delay: 1600 },
+            { text: 'Starting system services... OK', type: 'ok', delay: 2000 },
+            { text: 'Loading user interface...', type: 'info', delay: 2300 }
+        ];
+        
+        const container = document.getElementById('boot-messages');
+        
+        messages.forEach(msg => {
+            setTimeout(() => {
+                if (container) {
+                    const div = document.createElement('div');
+                    div.className = `boot-message ${msg.type}`;
+                    div.textContent = msg.text;
+                    container.appendChild(div);
+                }
+            }, msg.delay);
+        });
+        
+        // Transição Boot -> Login após ~2.5 segundos
+        setTimeout(() => {
+            document.getElementById('boot-screen').style.opacity = '0';
+            document.getElementById('boot-screen').style.transition = 'opacity 0.5s ease';
+            
+            setTimeout(() => {
+                document.getElementById('boot-screen').classList.add('hidden');
+                LoginScreen.show();
+                
+                // Inicializar áudio após interação do usuário na tela de login
+                SoundManager.init();
+            }, 500);
+        }, 2500);
+    },
+    
     renderStaticIcons() {
         // Renderizar ícones SVG nos elementos estáticos do HTML
         const ctxWallpaper = document.getElementById('ctx-wallpaper-icon');
@@ -1533,7 +1686,7 @@ const GlassOS = {
             if (e.key === 'Meta' || e.key === 'OS') { e.preventDefault(); this.toggleStartMenu(); }
             if (e.altKey && e.key === 'Tab') { e.preventDefault(); if (!document.getElementById('alt-tab-overlay').classList.contains('hidden')) this.cycleAltTab(); else this.showAltTab(); }
             if ((e.ctrlKey && e.shiftKey && e.key === 'F') || (e.key === 'l' && (e.metaKey || e.ctrlKey))) { e.preventDefault(); GlobalSearch.toggle(); }
-            if ((e.key === 'l' || e.key === 'L') && (e.metaKey || e.ctrlKey)) { e.preventDefault(); LockScreen.lock(); }
+            if ((e.key === 'l' || e.key === 'L') && (e.metaKey || e.ctrlKey)) { e.preventDefault(); LoginScreen.show(); }
             if (e.key === 'Escape') { this.closeStartMenu(); this.hideContextMenu(); this.hideAltTab(); this.closeAllModals(); QuickSettingsManager.close(); }
         });
         document.addEventListener('keyup', (e) => { if (e.key === 'Alt') this.hideAltTab(); });
@@ -1685,8 +1838,8 @@ const QuickSettingsManager = {
                 focusToggle.setAttribute('data-state', isActive.toString());
                 
                 // Integra com sistema de notificações
-                if (typeof GlassOS.notificationSystem !== 'undefined') {
-                    GlassOS.notificationSystem.toggleFocusMode();
+                if (typeof NotificationSystem !== 'undefined') {
+                    NotificationSystem.toggleFocusMode();
                 }
                 
                 // Sincroniza estado visual
