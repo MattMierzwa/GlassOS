@@ -1383,6 +1383,57 @@ body.focus-mode:hover #taskbar { opacity: 1; }
 .snap-zone.half-left { grid-column: 1; grid-row: 1 / -1; }
 .snap-zone.half-right { grid-column: 2; grid-row: 1 / -1; }
 
+/* ===== SNAP POPUP MENU (HOVER NO BOTÃO MAXIMIZAR) ===== */
+.snap-popup-menu {
+    position: absolute;
+    background: var(--bg-secondary);
+    backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    z-index: 10000;
+    box-shadow: 0 8px 32px var(--shadow-color);
+}
+
+.snap-popup-item {
+    width: 40px;
+    height: 30px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.snap-popup-item:hover {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    transform: scale(1.05);
+}
+
+.snap-popup-item svg {
+    width: 20px;
+    height: 16px;
+    fill: var(--text-primary);
+}
+
+/* ===== CANVAS DE PARTÍCULAS ===== */
+#particle-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9998;
+}
+
 /* ===== MODAL DE ATUALIZAÇÃO ===== */
 #update-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 8000; display: flex; align-items: center; justify-content: center; }
 #update-modal .modal-box { min-width: 400px; }
@@ -1587,6 +1638,34 @@ body.light-mode .glass-panel { backdrop-filter: none; }
     outline: none;
 }
 .settings-option input[type="range"] { width: 150px; cursor: pointer; }
+.settings-option .toggle-switch {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 13px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.settings-option .toggle-switch.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+}
+.settings-option .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+.settings-option .toggle-switch.active::after {
+    transform: translateX(22px);
+}
 .wallpaper-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
 .wallpaper-option {
     height: 60px;
