@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlassOS v1.1</title>
+    <title>GlassOS</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -107,6 +107,69 @@
 
     <div id="toast-container"></div>
 
+    <!-- Overlay de Brilho (simulação) -->
+    <div id="brightness-overlay"></div>
+
+    <!-- Painel de Configurações Rápidas -->
+    <div id="quick-settings-panel" class="glass-panel hidden">
+        <div class="qs-header">
+            <h3>Configurações Rápidas</h3>
+            <button id="qs-close" title="Fechar">×</button>
+        </div>
+        
+        <!-- Sliders -->
+        <div class="qs-section">
+            <div class="qs-item">
+                <span class="qs-icon" id="qs-volume-icon"></span>
+                <div class="qs-slider-container">
+                    <input type="range" id="qs-volume" min="0" max="100" value="50">
+                    <span id="qs-volume-val">50%</span>
+                </div>
+            </div>
+            
+            <div class="qs-item">
+                <span class="qs-icon" id="qs-brightness-icon"></span>
+                <div class="qs-slider-container">
+                    <input type="range" id="qs-brightness" min="0" max="100" value="100">
+                    <span id="qs-brightness-val">100%</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Toggles Grid -->
+        <div class="qs-grid">
+            <button class="qs-toggle" id="qs-wifi" data-state="false">
+                <span class="qs-toggle-icon" id="qs-wifi-icon"></span>
+                <span class="qs-toggle-label">Wi-Fi</span>
+            </button>
+            
+            <button class="qs-toggle" id="qs-bluetooth" data-state="false">
+                <span class="qs-toggle-icon" id="qs-bluetooth-icon"></span>
+                <span class="qs-toggle-label">Bluetooth</span>
+            </button>
+            
+            <button class="qs-toggle" id="qs-airplane" data-state="false">
+                <span class="qs-toggle-icon" id="qs-airplane-icon"></span>
+                <span class="qs-toggle-label">Avião</span>
+            </button>
+            
+            <button class="qs-toggle" id="qs-focus" data-state="false">
+                <span class="qs-toggle-icon" id="qs-focus-icon"></span>
+                <span class="qs-toggle-label">Foco</span>
+            </button>
+            
+            <button class="qs-toggle" id="qs-power-save" data-state="false">
+                <span class="qs-toggle-icon" id="qs-power-icon"></span>
+                <span class="qs-toggle-label">Energia</span>
+            </button>
+            
+            <button class="qs-toggle" id="qs-settings-btn" data-state="false">
+                <span class="qs-toggle-icon" id="qs-settings-icon"></span>
+                <span class="qs-toggle-label">Ajustes</span>
+            </button>
+        </div>
+    </div>
+
     <div class="snap-overlay" id="snap-overlay">
         <div class="snap-zone half-left" data-layout="half-left"></div>
         <div class="snap-zone half-right" data-layout="half-right"></div>
@@ -129,8 +192,11 @@
                 <svg id="sound-icon-mute" viewBox="0 0 24 24" style="width:18px;height:18px;display:none" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
                 <svg id="sound-icon-on" viewBox="0 0 24 24" style="width:18px;height:18px;display:none" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
             </button>
-            <span id="tray-clock"></span>
-            <span id="tray-date"></span>
+            <!-- Novo design do relógio com duas linhas -->
+            <div id="tray-clock-container" class="tray-clock-wrapper" title="Configurações Rápidas">
+                <div class="tray-time" id="tray-time">00:00</div>
+                <div class="tray-date" id="tray-date">00/00</div>
+            </div>
         </div>
     </div>
 
