@@ -1076,6 +1076,12 @@ const GlassOS = {
         UpdateSystem.init();
         PerformanceOptimizer.init();
         SnapLayouts.init();
+        
+        // Mostrar tela de login/bloqueio imediatamente ao iniciar o sistema
+        setTimeout(() => {
+            LockScreen.lock();
+        }, 500);
+        
         console.log('GlassOS v1.1 inicializado com todas as funcionalidades.');
     },
     renderStaticIcons() {
