@@ -152,6 +152,9 @@
     <!-- Overlay de Brilho (simulação) -->
     <div id="brightness-overlay"></div>
 
+    <!-- Canvas de Partículas -->
+    <canvas id="particle-canvas"></canvas>
+
     <!-- Painel de Configurações Rápidas -->
     <div id="quick-settings-panel" class="glass-panel hidden">
         <div class="qs-header">
@@ -215,6 +218,23 @@
     <div class="snap-overlay" id="snap-overlay">
         <div class="snap-zone half-left" data-layout="half-left"></div>
         <div class="snap-zone half-right" data-layout="half-right"></div>
+        <div class="snap-zone quarter-tl" data-layout="quarter-tl"></div>
+        <div class="snap-zone quarter-tr" data-layout="quarter-tr"></div>
+        <div class="snap-zone quarter-bl" data-layout="quarter-bl"></div>
+        <div class="snap-zone quarter-br" data-layout="quarter-br"></div>
+    </div>
+
+    <!-- Modal de Criptografia -->
+    <div id="encrypt-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3 id="encrypt-modal-title">🔐 Proteger Pasta</h3>
+            <p id="encrypt-modal-desc">Digite uma senha para proteger esta pasta:</p>
+            <input type="password" id="encrypt-password" placeholder="Senha" style="width:100%;padding:10px;margin:15px 0;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:6px;">
+            <div class="modal-actions">
+                <button id="encrypt-cancel">Cancelar</button>
+                <button id="encrypt-confirm" class="primary">Confirmar</button>
+            </div>
+        </div>
     </div>
 
     <div id="taskbar">

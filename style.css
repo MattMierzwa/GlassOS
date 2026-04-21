@@ -1382,8 +1382,51 @@ body.focus-mode:hover #taskbar { opacity: 1; }
 .snap-zone.full { grid-column: 1 / -1; grid-row: 1 / -1; }
 .snap-zone.half-left { grid-column: 1; grid-row: 1 / -1; }
 .snap-zone.half-right { grid-column: 2; grid-row: 1 / -1; }
+.snap-zone.quarter-tl { grid-column: 1; grid-row: 1; }
+.snap-zone.quarter-tr { grid-column: 2; grid-row: 1; }
+.snap-zone.quarter-bl { grid-column: 1; grid-row: 2; }
+.snap-zone.quarter-br { grid-column: 2; grid-row: 2; }
 
-/* ===== MODAL DE ATUALIZAÇÃO ===== */
+/* ===== CANVAS DE PARTÍCULAS ===== */
+#particle-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9997;
+}
+
+/* ===== TASK MANAGER ===== */
+.task-manager-container { padding: 12px; height: 100%; display: flex; flex-direction: column; }
+.task-manager-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.task-manager-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.task-manager-stat { background: var(--bg-tertiary); border-radius: 8px; padding: 12px; }
+.task-manager-stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+.task-manager-stat-value { font-size: 18px; font-weight: bold; color: var(--text-primary); }
+.task-manager-stat-bar { height: 4px; background: var(--bg-hover); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+.task-manager-stat-fill { height: 100%; background: var(--accent-color); transition: width 0.3s; }
+.task-manager-table { flex: 1; overflow: auto; border: 1px solid var(--border-color); border-radius: 8px; }
+.task-manager-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.task-manager-table th { background: var(--titlebar-bg); padding: 10px; text-align: left; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid var(--border-light); position: sticky; top: 0; }
+.task-manager-table td { padding: 10px; border-bottom: 1px solid var(--border-light); color: var(--text-primary); }
+.task-manager-table tr:hover { background: var(--bg-hover); }
+.task-manager-table .btn-end-task { padding: 4px 10px; background: var(--danger-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; }
+.task-manager-table .btn-end-task:hover { opacity: 0.8; }
+
+/* ===== JOGOS - SNAKE & PONG ===== */
+.game-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 12px; }
+.game-canvas { background: #0a0a1a; border: 2px solid var(--accent-color); border-radius: 8px; box-shadow: 0 0 20px rgba(96, 165, 250, 0.3); }
+.game-info { display: flex; gap: 24px; margin-bottom: 12px; font-size: 14px; color: var(--text-secondary); }
+.game-score { font-size: 18px; font-weight: bold; color: var(--accent-color); }
+.game-controls { margin-top: 12px; text-align: center; font-size: 11px; color: var(--text-muted); }
+.game-btn { padding: 8px 20px; background: var(--accent-color); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-top: 10px; }
+.game-btn:hover { background: var(--accent-hover); }
+
+/* ===== MODAL DE CRIPTOGRAFIA ===== */
+#encrypt-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 8500; display: flex; align-items: center; justify-content: center; }
+#encrypt-modal .modal-box { min-width: 380px; }
+.folder-encrypted::after { content: ' 🔒'; }
+
+/* ===== MODO LEVE (PERFORMANCE) ===== */
 #update-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 8000; display: flex; align-items: center; justify-content: center; }
 #update-modal .modal-box { min-width: 400px; }
 
