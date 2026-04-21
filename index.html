@@ -8,7 +8,62 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="desktop">
+    <!-- TELA DE BOOT -->
+    <div id="boot-screen">
+        <div class="boot-content">
+            <div class="boot-logo">
+                <svg width="120" height="120" viewBox="0 0 100 100" fill="none">
+                    <rect x="10" y="10" width="35" height="35" rx="8" fill="url(#boot-gradient)"/>
+                    <rect x="55" y="10" width="35" height="35" rx="8" fill="url(#boot-gradient)"/>
+                    <rect x="10" y="55" width="35" height="35" rx="8" fill="url(#boot-gradient)"/>
+                    <rect x="55" y="55" width="35" height="35" rx="8" fill="url(#boot-gradient)"/>
+                    <defs>
+                        <linearGradient id="boot-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#60a5fa"/>
+                            <stop offset="100%" style="stop-color:#3b82f6"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <h1 class="boot-title">GlassOS</h1>
+            <div class="boot-loader">
+                <div class="loader-bar"></div>
+            </div>
+            <div class="boot-messages" id="boot-messages"></div>
+        </div>
+    </div>
+
+    <!-- TELA DE LOGIN REDESIGNADA -->
+    <div id="login-screen" class="hidden">
+        <div class="login-content">
+            <div class="login-clock-container">
+                <div class="login-clock" id="login-clock">00:00</div>
+                <div class="login-date" id="login-date">00/00/0000</div>
+            </div>
+            <div class="login-user-section">
+                <div class="login-avatar">👤</div>
+                <h2 class="login-username">Usuário</h2>
+            </div>
+            <div class="login-form">
+                <div class="password-input-wrapper">
+                    <span class="password-icon">🔒</span>
+                    <input type="password" id="login-password" placeholder="Senha (1234)" maxlength="20" autocomplete="off">
+                </div>
+                <button id="login-submit" class="login-btn">Entrar</button>
+                <div id="login-error" class="login-error hidden">
+                    <span class="error-icon">⚠️</span>
+                    <span class="error-text">Senha incorreta! Tente novamente.</span>
+                </div>
+            </div>
+            <div class="login-footer">
+                <button id="login-accessibility" class="login-footer-btn" title="Acessibilidade">♿</button>
+                <button id="login-network" class="login-footer-btn" title="Rede">📶</button>
+                <button id="login-power" class="login-footer-btn" title="Desligar">⏻</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="desktop" class="hidden">
         <div id="desktop-icons"></div>
         <div id="window-container"></div>
         <div id="widgets-container"></div>
@@ -48,19 +103,6 @@
         <div class="shutdown-content">
             <div class="shutdown-spinner"></div>
             <p id="shutdown-text">Desligando...</p>
-        </div>
-    </div>
-
-    <div id="lock-screen" class="hidden">
-        <div class="lock-screen-content">
-            <div class="lock-clock" id="lock-clock">00:00</div>
-            <div class="lock-date" id="lock-date">00/00/0000</div>
-            <div class="lock-input-area">
-                <input type="password" id="lock-password" placeholder="Senha (1234)..." maxlength="20">
-                <button id="lock-unlock">🔓 Desbloquear</button>
-                <button id="lock-shutdown">⏻ Desligar</button>
-            </div>
-            <div id="lock-error" class="lock-error hidden">Senha incorreta!</div>
         </div>
     </div>
 
