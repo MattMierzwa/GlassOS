@@ -348,7 +348,8 @@ body {
 
 [data-theme="cyberpunk"] .window-titlebar:hover { animation: glitch 0.3s infinite; }
 
-.window-titlebar .title-icon { font-size: 14px; margin-right: 8px; }
+.window-titlebar .title-icon { display: flex; align-items: center; justify-content: center; margin-right: 8px; }
+.window-titlebar .title-icon .svg-icon { width: 16px; height: 16px; }
 .window-titlebar .title-text {
     flex: 1;
     font-size: 12px;
@@ -523,7 +524,8 @@ body.focus-mode:hover #taskbar { opacity: 1; }
 }
 
 .taskbar-item.active::after { opacity: 1; width: 24px; }
-.taskbar-item .taskbar-icon { font-size: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.taskbar-item .taskbar-icon { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.taskbar-item .taskbar-icon .svg-icon { width: 16px; height: 16px; }
 
 /* SVG Icons */
 .svg-icon {
@@ -542,8 +544,8 @@ body.focus-mode:hover #taskbar { opacity: 1; }
 }
 
 .app-icon .svg-icon {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
 }
 
 /* Cores específicas por ícone */
@@ -655,7 +657,7 @@ body.focus-mode:hover #taskbar { opacity: 1; }
     transition: background var(--transition-speed);
 }
 .start-app-item:hover { background: var(--bg-hover); }
-.start-app-item .app-icon { font-size: 28px; display: flex; align-items: center; justify-content: center; }
+.start-app-item .app-icon { display: flex; align-items: center; justify-content: center; }
 .start-app-item .app-name { font-size: 11px; text-align: center; color: var(--text-secondary); }
 
 /* ===== MENU DE CONTEXTO ===== */

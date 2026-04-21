@@ -135,7 +135,7 @@ const WindowManager = {
 
         winEl.innerHTML = `
             <div class="window-titlebar">
-                <span class="title-icon">${icon}</span>
+                <span class="title-icon">${renderIcon(appId, 20)}</span>
                 <span class="title-text">${title}</span>
                 <div class="window-controls">
                     <button class="btn-minimize" title="Minimizar">─</button>
@@ -273,7 +273,7 @@ const WindowManager = {
         this.windows.forEach((winData, id) => {
             const btn = document.createElement('button');
             btn.className = 'taskbar-item' + (this.activeWindowId === id && !winData.minimized ? ' active' : '');
-            btn.innerHTML = `<span class="taskbar-icon">${winData.icon}</span><span>${winData.title}</span>`;
+            btn.innerHTML = `<span class="taskbar-icon">${renderIcon(winData.appId, 20)}</span><span>${winData.title}</span>`;
             btn.addEventListener('click', () => {
                 if (winData.minimized) this.focus(id);
                 else if (this.activeWindowId === id) this.minimize(id);
@@ -1037,7 +1037,7 @@ const AppRegistry = {
         filtered.forEach(app => {
             const el = document.createElement('div');
             el.className = 'start-app-item';
-            el.innerHTML = `<span class="app-icon">${app.icon}</span><span class="app-name">${app.name}</span>`;
+            el.innerHTML = `${renderIcon(app.id, 24)}<span class="app-name">${app.name}</span>`;
             el.addEventListener('click', () => this.open(app.id));
             container.appendChild(el);
         });
@@ -1048,7 +1048,7 @@ const AppRegistry = {
         this.apps.forEach(app => {
             const el = document.createElement('div');
             el.className = 'desktop-icon';
-            el.innerHTML = `<span class="icon">${app.icon}</span><span class="label">${app.name}</span>`;
+            el.innerHTML = `${renderIcon(app.id, 32)}<span class="label">${app.name}</span>`;
             el.addEventListener('dblclick', () => this.open(app.id));
             container.appendChild(el);
         });
