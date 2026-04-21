@@ -1,4 +1,4 @@
-```gitignore
+```
 # Compiled and build artifacts
 *.pyc
 __pycache__/
@@ -17,44 +17,32 @@ venv/
 .venv/
 .env
 .env.local
-*.env.*
+.env.*
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Editors
+.vscode/
+.idea/
 
 # Build directories
 dist/
 build/
 target/
-*.log
+.gradle/
+.mypy_cache/
+.pytest_cache/
 coverage/
 htmlcov/
-*.coverage
-
-# Editors and IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
+.coverage
 
 # System files
 .DS_Store
 Thumbs.db
-
-# Python specific
-*.pyc
-__pycache__/
-*.pyo
-*.pyd
-.Python
-*.so
-*.egg-info/
-.eggs/
-
-# Cache directories
-.mypy_cache/
-.pytest_cache/
-.coverage
-.coverage.*
-.cache/
 
 # Compressed files
 *.zip

@@ -8,6 +8,95 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- TELA DE BOOT (POST/BIOS) -->
+    <div id="boot-screen">
+        <div class="boot-content">
+            <div class="boot-logo">
+                <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                </svg>
+            </div>
+            <div class="boot-title">GlassOS</div>
+            <div class="boot-loader">
+                <div class="loader-bar"></div>
+            </div>
+            <div class="boot-messages" id="boot-messages"></div>
+        </div>
+    </div>
+
+    <!-- TELA DE LOGIN REDESIGNADA -->
+    <div id="login-screen" class="hidden">
+        <div class="login-background"></div>
+        <div class="login-content">
+            <div class="login-clock-container">
+                <div class="login-time" id="login-time">00:00</div>
+                <div class="login-date" id="login-date">Segunda-feira, 1 de Janeiro</div>
+            </div>
+            
+            <div class="login-user-section">
+                <div class="user-avatar-large">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <div class="user-name-large">Usuário</div>
+            </div>
+            
+            <div class="login-input-section">
+                <div class="password-input-wrapper">
+                    <span class="password-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                    </span>
+                    <input type="password" id="login-password" placeholder="Digite sua senha" maxlength="20" autocomplete="off">
+                    <button id="login-submit" class="login-submit-btn" title="Entrar">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="login-error" class="login-error hidden">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <span>Senha incorreta! Tente novamente.</span>
+                </div>
+            </div>
+            
+            <div class="login-footer">
+                <button id="login-accessibility" class="login-footer-btn" title="Acessibilidade">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                </button>
+                <button id="login-network" class="login-footer-btn" title="Rede">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+                        <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+                        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+                        <line x1="12" y1="20" x2="12.01" y2="20"/>
+                    </svg>
+                </button>
+                <button id="login-shutdown" class="login-footer-btn" title="Desligar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
+                        <line x1="12" y1="2" x2="12" y2="12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="desktop">
         <div id="desktop-icons"></div>
         <div id="window-container"></div>
