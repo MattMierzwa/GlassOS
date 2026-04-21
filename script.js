@@ -1,5 +1,65 @@
 // script.js - COMPLETO COM TODAS AS NOVAS FUNCIONALIDADES
 
+// ===== SISTEMA DE ÍCONES SVG =====
+const GlassIcons = {
+    // APLICATIVOS PRINCIPAIS
+    notepad: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>`,
+    calculator: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="16" y2="18"/></svg>`,
+    files: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><path d="M2 10h20"/><path d="M12 10v10"/><path d="M7 10v10"/><path d="M17 10v10"/></svg>`,
+    browser: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/><path d="M12 2v20"/><path d="M12 12l4-4"/></svg>`,
+    settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+    terminal: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/><rect x="2" y="3" width="20" height="18" rx="2"/></svg>`,
+    clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+    calendar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><text x="12" y="17" text-anchor="middle" font-size="6" font-weight="bold" fill="currentColor" stroke="none">15</text></svg>`,
+    sysmon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><path d="M2 20h20"/></svg>`,
+    imageeditor: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`,
+    musicplayer: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
+    paint: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.375-9.375z"/><path d="M12 15l-3 3"/></svg>`,
+    
+    // SISTEMA
+    'start-menu': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`,
+    notifications: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><line x1="18" y1="4" x2="18" y2="4"/><line x1="6" y1="4" x2="6" y2="4"/></svg>`,
+    clipboard: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>`,
+    close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+    minimize: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+    maximize: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>`,
+    
+    // WIDGETS
+    'widget-clock': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+    'widget-sysmon': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><rect x="6" y="6" width="4" height="4"/><rect x="14" y="6" width="4" height="4"/><rect x="6" y="14" width="4" height="4"/><rect x="14" y="14" width="4" height="4"/><line x1="12" y1="6" x2="12" y2="18"/><line x1="6" y1="12" x2="18" y2="12"/></svg>`
+};
+
+// Cores específicas por ícone para temas
+const IconColors = {
+    notepad: '#60a5fa',
+    calculator: '#22c55e',
+    files: '#f59e0b',
+    browser: '#3b82f6',
+    settings: '#94a3b8',
+    terminal: '#22c55e',
+    clock: '#f97316',
+    calendar: '#ef4444',
+    sysmon: '#a78bfa',
+    imageeditor: '#6366f1',
+    musicplayer: '#ec4899',
+    paint: '#6366f1',
+    'start-menu': 'var(--accent-color)',
+    notifications: '#f59e0b',
+    clipboard: '#64748b',
+    close: 'currentColor',
+    minimize: 'currentColor',
+    maximize: 'currentColor',
+    'widget-clock': '#f97316',
+    'widget-sysmon': '#a78bfa'
+};
+
+// Função para renderizar ícone com cor específica
+function renderIcon(iconName, size = 24, className = '') {
+    const icon = GlassIcons[iconName] || GlassIcons.files;
+    const color = IconColors[iconName] || 'currentColor';
+    return `<svg class="svg-icon ${className}" viewBox="0 0 24 24" style="width:${size}px;height:${size}px;color:${color}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icon.replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg>`;
+}
+
 // ===== SISTEMA DE ARMAZENAMENTO =====
 const Storage = {
     set(key, value) {
@@ -75,7 +135,7 @@ const WindowManager = {
 
         winEl.innerHTML = `
             <div class="window-titlebar">
-                <span class="title-icon">${icon}</span>
+                <span class="title-icon">${renderIcon(appId, 20)}</span>
                 <span class="title-text">${title}</span>
                 <div class="window-controls">
                     <button class="btn-minimize" title="Minimizar">─</button>
@@ -213,7 +273,7 @@ const WindowManager = {
         this.windows.forEach((winData, id) => {
             const btn = document.createElement('button');
             btn.className = 'taskbar-item' + (this.activeWindowId === id && !winData.minimized ? ' active' : '');
-            btn.innerHTML = `<span class="taskbar-icon">${winData.icon}</span><span>${winData.title}</span>`;
+            btn.innerHTML = `<span class="taskbar-icon">${renderIcon(winData.appId, 20)}</span><span>${winData.title}</span>`;
             btn.addEventListener('click', () => {
                 if (winData.minimized) this.focus(id);
                 else if (this.activeWindowId === id) this.minimize(id);
@@ -353,12 +413,18 @@ const NotificationSystem = {
     updateBadge() {
         const count = this.notifications.length;
         const badge = document.getElementById('tray-notifications');
-        if (badge) badge.textContent = count > 0 ? `🔔 ${count}` : '🔔';
+        if (badge) badge.innerHTML = count > 0 ? renderIcon('notifications', 16) + `<span style="margin-left:4px">${count}</span>` : renderIcon('notifications', 16);
     },
     showToast(title, message, type) {
         const container = document.getElementById('toast-container');
         if (!container) return;
-        const icons = { info: 'ℹ️', success: '✅', warning: '⚠️', error: '❌', urgent: '🚨' };
+        const icons = { 
+            info: renderIcon('notifications', 18, '', '#3b82f6'), 
+            success: `<svg viewBox="0 0 24 24" style="width:18px;height:18px;color:#22c55e" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>`,
+            warning: `<svg viewBox="0 0 24 24" style="width:18px;height:18px;color:#f59e0b" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+            error: `<svg viewBox="0 0 24 24" style="width:18px;height:18px;color:#ef4444" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+            urgent: `<svg viewBox="0 0 24 24" style="width:18px;height:18px;color:#f97316" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`
+        };
         const toast = document.createElement('div');
         toast.className = 'toast';
         toast.innerHTML = `<span class="toast-icon">${icons[type] || icons.info}</span><div class="toast-content"><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div>`;
@@ -437,13 +503,14 @@ const GlobalSearch = {
         AppRegistry.apps.forEach(app => { if (app.name.toLowerCase().includes(q)) results.push({ type: 'app', title: app.name, desc: 'Aplicativo', icon: app.icon, action: () => AppRegistry.open(app.id) }); });
         const fs = FileSystem.getFS(); this.searchFiles(fs['/'], '/', q, results);
         const settings = ['tema', 'wallpaper', 'papel de parede', 'transparência', 'blur', 'desfoque'];
-        settings.forEach(s => { if (s.includes(q)) results.push({ type: 'setting', title: 'Configurações - ' + s.charAt(0).toUpperCase() + s.slice(1), desc: 'Configuração do sistema', icon: '⚙️', action: () => AppRegistry.open('settings') }); });
+        settings.forEach(s => { if (s.includes(q)) results.push({ type: 'setting', title: 'Configurações - ' + s.charAt(0).toUpperCase() + s.slice(1), desc: 'Configuração do sistema', icon: renderIcon('settings', 20), action: () => AppRegistry.open('settings') }); });
         this.renderResults(results);
     },
     searchFiles(node, path, query, results) {
         if (!node || !node.children) return;
         Object.entries(node.children).forEach(([name, item]) => {
-            if (name.toLowerCase().includes(query)) results.push({ type: 'file', title: name, desc: path + ' • ' + (item.type === 'folder' ? 'Pasta' : 'Arquivo'), icon: item.type === 'folder' ? '📁' : '📄', action: () => AppRegistry.open('files') });
+            const fileIcon = item.type === 'folder' ? renderIcon('files', 20) : `<svg viewBox="0 0 24 24" style="width:20px;height:20px;color:#94a3b8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+            if (name.toLowerCase().includes(query)) results.push({ type: 'file', title: name, desc: path + ' • ' + (item.type === 'folder' ? 'Pasta' : 'Arquivo'), icon: fileIcon, action: () => AppRegistry.open('files') });
             if (item.type === 'folder') this.searchFiles(item, path === '/' ? `/${name}` : `${path}/${name}`, query, results);
         });
     },
@@ -525,7 +592,11 @@ const WidgetSystem = {
         `).join('');
         this.setupWidgetDrag(); this.startWidgetUpdates();
     },
-    getWidgetTitle(type) { const titles = { clock: '🕐 Relógio', sysmon: '📊 Sistema', weather: '🌤️ Clima' }; return titles[type] || type; },
+    getWidgetTitle(type) { 
+        const iconMap = { clock: 'widget-clock', sysmon: 'widget-sysmon', weather: 'sysmon' };
+        const titles = { clock: 'Relógio', sysmon: 'Sistema', weather: 'Clima' }; 
+        return renderIcon(iconMap[type] || 'sysmon', 16) + ' ' + (titles[type] || type); 
+    },
     getWidgetContent(type) {
         if (type === 'clock') { const now = new Date(); return `<div class="time">${now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}</div><div class="date">${now.toLocaleDateString('pt-BR')}</div>`; }
         else if (type === 'sysmon') return `<div class="label"><span>CPU</span><span id="widget-cpu">0%</span></div><div class="bar"><div class="bar-fill" id="widget-cpu-bar" style="width:0%"></div></div><div class="label"><span>Memória</span><span id="widget-ram">0%</span></div><div class="bar"><div class="bar-fill" id="widget-ram-bar" style="width:0%"></div></div>`;
@@ -698,8 +769,8 @@ const Apps = {};
 
 // Apps originais (preservados)
 Apps.Notepad = function() {
-    const html = `<div class="notepad-container"><div class="notepad-toolbar"><button data-action="new" title="Novo">📄 Novo</button><button data-action="open" title="Abrir">📂 Abrir</button><button data-action="save" title="Salvar">💾 Salvar</button><button data-action="save-as" title="Salvar como">📋 Salvar como</button></div><textarea class="notepad-textarea" placeholder="Digite seu texto aqui..." spellcheck="false"></textarea><div class="notepad-status"><span class="char-count">Caracteres: 0</span><span class="line-count">Linhas: 1</span></div></div>`;
-    const winData = WindowManager.create('notepad', 'Bloco de Notas', '📝', html, { width: 650, height: 450 });
+    const html = `<div class="notepad-container"><div class="notepad-toolbar"><button data-action="new" title="Novo">${renderIcon('files', 16)} Novo</button><button data-action="open" title="Abrir">${renderIcon('files', 16)} Abrir</button><button data-action="save" title="Salvar">${renderIcon('clipboard', 16)} Salvar</button><button data-action="save-as" title="Salvar como">${renderIcon('clipboard', 16)} Salvar como</button></div><textarea class="notepad-textarea" placeholder="Digite seu texto aqui..." spellcheck="false"></textarea><div class="notepad-status"><span class="char-count">Caracteres: 0</span><span class="line-count">Linhas: 1</span></div></div>`;
+    const winData = WindowManager.create('notepad', 'Bloco de Notas', GlassIcons.notepad, html, { width: 650, height: 450 });
     const textarea = winData.element.querySelector('.notepad-textarea');
     const charCount = winData.element.querySelector('.char-count');
     const lineCount = winData.element.querySelector('.line-count');
@@ -716,7 +787,7 @@ Apps.Notepad = function() {
 
 Apps.Calculator = function() {
     const html = `<div class="calculator-container"><div class="calc-display"><div class="calc-expression"></div><div class="calc-result">0</div></div><div class="calc-buttons"><button class="calc-btn operator" data-val="clear">C</button><button class="calc-btn operator" data-val="backspace">⌫</button><button class="calc-btn operator" data-val="%">%</button><button class="calc-btn operator" data-val="/">÷</button><button class="calc-btn" data-val="7">7</button><button class="calc-btn" data-val="8">8</button><button class="calc-btn" data-val="9">9</button><button class="calc-btn operator" data-val="*">×</button><button class="calc-btn" data-val="4">4</button><button class="calc-btn" data-val="5">5</button><button class="calc-btn" data-val="6">6</button><button class="calc-btn operator" data-val="-">−</button><button class="calc-btn" data-val="1">1</button><button class="calc-btn" data-val="2">2</button><button class="calc-btn" data-val="3">3</button><button class="calc-btn operator" data-val="+">+</button><button class="calc-btn operator" data-val="sqrt">√</button><button class="calc-btn" data-val="0">0</button><button class="calc-btn" data-val=".">.</button><button class="calc-btn equals" data-val="=">=</button><button class="calc-btn operator wide" data-val="^">x^y</button><button class="calc-btn operator" data-val="(">(</button><button class="calc-btn operator" data-val=")">)</button></div><div class="calc-history"></div></div>`;
-    const winData = WindowManager.create('calculator', 'Calculadora', '🧮', html, { width: 340, height: 520 });
+    const winData = WindowManager.create('calculator', 'Calculadora', GlassIcons.calculator, html, { width: 340, height: 520 });
     let expression = '', lastResult = '0', history = [];
     const displayExpr = winData.element.querySelector('.calc-expression'), displayResult = winData.element.querySelector('.calc-result'), historyEl = winData.element.querySelector('.calc-history');
     function updateDisplay() { displayExpr.textContent = expression || ''; displayResult.textContent = lastResult; }
@@ -727,8 +798,8 @@ Apps.Calculator = function() {
 };
 
 Apps.FileManager = function() {
-    const html = `<div class="file-manager"><div class="fm-toolbar"><button data-action="new-folder">📁 Nova Pasta</button><button data-action="new-file">📄 Novo Arquivo</button><button data-action="rename">✏️ Renomear</button><button data-action="delete">🗑️ Excluir</button><div class="fm-breadcrumbs" data-path="/"></div></div><div class="fm-content"><div class="fm-grid"></div></div></div>`;
-    const winData = WindowManager.create('files', 'Arquivos', '📁', html, { width: 700, height: 450 });
+    const html = `<div class="file-manager"><div class="fm-toolbar"><button data-action="new-folder">${renderIcon('files', 16)} Nova Pasta</button><button data-action="new-file">${renderIcon('files', 16)} Novo Arquivo</button><button data-action="rename">${renderIcon('paint', 16)} Renomear</button><button data-action="delete">${renderIcon('close', 16)} Excluir</button><div class="fm-breadcrumbs" data-path="/"></div></div><div class="fm-content"><div class="fm-grid"></div></div></div>`;
+    const winData = WindowManager.create('files', 'Arquivos', GlassIcons.files, html, { width: 700, height: 450 });
     let currentPath = '/', selectedName = null, fs = FileSystem.getFS();
     const grid = winData.element.querySelector('.fm-grid'), breadcrumbs = winData.element.querySelector('.fm-breadcrumbs');
     function render() {
@@ -742,7 +813,7 @@ Apps.FileManager = function() {
                 const el = document.createElement('div');
                 el.className = 'fm-item' + (selectedName === name ? ' selected' : '');
                 el.dataset.name = name;
-                el.innerHTML = `<span class="fm-icon">${item.type === 'folder' ? '📁' : '📄'}</span><span class="fm-name">${name}</span>`;
+                el.innerHTML = `<span class="fm-icon">${item.type === 'folder' ? renderIcon('files', 24) : renderIcon('clipboard', 24)}</span><span class="fm-name">${name}</span>`;
                 el.addEventListener('click', (e) => { e.stopPropagation(); selectedName = name; render(); });
                 el.addEventListener('dblclick', () => {
                     if (item.type === 'folder') { currentPath = currentPath === '/' ? `/${name}` : `${currentPath}/${name}`; selectedName = null; render(); renderBreadcrumbs(); }
@@ -755,10 +826,10 @@ Apps.FileManager = function() {
     }
     function renderBreadcrumbs() {
         breadcrumbs.innerHTML = ''; breadcrumbs.dataset.path = currentPath;
-        if (currentPath === '/') { const el = document.createElement('span'); el.className = 'fm-breadcrumb'; el.textContent = '📁 Raiz'; el.addEventListener('click', () => { currentPath = '/'; selectedName = null; render(); }); breadcrumbs.appendChild(el); }
+        if (currentPath === '/') { const el = document.createElement('span'); el.className = 'fm-breadcrumb'; el.innerHTML = renderIcon('files', 16) + ' Raiz'; el.addEventListener('click', () => { currentPath = '/'; selectedName = null; render(); }); breadcrumbs.appendChild(el); }
         else {
             const parts = currentPath.split('/').filter(Boolean); let buildPath = '';
-            const rootEl = document.createElement('span'); rootEl.className = 'fm-breadcrumb'; rootEl.textContent = '📁 Raiz'; rootEl.addEventListener('click', () => { currentPath = '/'; selectedName = null; render(); }); breadcrumbs.appendChild(rootEl);
+            const rootEl = document.createElement('span'); rootEl.className = 'fm-breadcrumb'; rootEl.innerHTML = renderIcon('files', 16) + ' Raiz'; rootEl.addEventListener('click', () => { currentPath = '/'; selectedName = null; render(); }); breadcrumbs.appendChild(rootEl);
             parts.forEach((part, i) => { const sep = document.createElement('span'); sep.className = 'fm-breadcrumb-sep'; sep.textContent = '›'; breadcrumbs.appendChild(sep); buildPath += `/${part}`; const el = document.createElement('span'); el.className = 'fm-breadcrumb'; el.textContent = part; const cp = buildPath; el.addEventListener('click', () => { currentPath = cp; selectedName = null; render(); }); if (i === parts.length - 1) el.style.fontWeight = '600'; breadcrumbs.appendChild(el); });
         }
     }
@@ -769,8 +840,8 @@ Apps.FileManager = function() {
 
 Apps.Browser = function() {
     const favorites = Storage.get('browser-favorites', [{ name: 'Wikipedia', url: 'https://www.wikipedia.org' }]);
-    const html = `<div class="browser-container"><div class="browser-favorites"></div><div class="browser-toolbar"><button data-action="back" title="Voltar">◀</button><button data-action="forward" title="Avançar">▶</button><button data-action="reload" title="Recarregar">⟳</button><input type="text" class="browser-url" placeholder="Digite uma URL..." value=""><button class="browser-fav-btn" data-action="fav" title="Favorito">☆</button></div><iframe class="browser-frame" sandbox="allow-same-origin allow-scripts allow-forms allow-popups" src="about:blank"></iframe></div>`;
-    const winData = WindowManager.create('browser', 'Navegador', '🌐', html, { width: 850, height: 550 });
+    const html = `<div class="browser-container"><div class="browser-favorites"></div><div class="browser-toolbar"><button data-action="back" title="Voltar">◀</button><button data-action="forward" title="Avançar">▶</button><button data-action="reload" title="Recarregar">${renderIcon('clock', 16)}</button><input type="text" class="browser-url" placeholder="Digite uma URL..." value=""><button class="browser-fav-btn" data-action="fav" title="Favorito">☆</button></div><iframe class="browser-frame" sandbox="allow-same-origin allow-scripts allow-forms allow-popups" src="about:blank"></iframe></div>`;
+    const winData = WindowManager.create('browser', 'Navegador', GlassIcons.browser, html, { width: 850, height: 550 });
     const iframe = winData.element.querySelector('.browser-frame'), urlInput = winData.element.querySelector('.browser-url'), favBtn = winData.element.querySelector('.browser-fav-btn'), favContainer = winData.element.querySelector('.browser-favorites');
     let history = [], historyIndex = -1, currentUrl = '';
     function navigate(url) { if (!url) return; if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url; currentUrl = url; urlInput.value = url; iframe.src = url; if (historyIndex < history.length - 1) history = history.slice(0, historyIndex + 1); history.push(url); historyIndex = history.length - 1; updateFavBtn(); }
@@ -786,8 +857,8 @@ Apps.Settings = function() {
     const settings = ThemeManager.getSettings();
     let wallpaperOptionsHTML = '';
     Object.entries(ThemeManager.wallpapers).forEach(([name, gradient]) => { wallpaperOptionsHTML += `<div class="wallpaper-option ${settings.wallpaper === gradient ? 'selected' : ''}" data-wallpaper="${gradient}" style="background: ${gradient};" title="${name}"></div>`; });
-    const html = `<div class="settings-container"><div class="settings-section"><h3>🎨 Tema</h3><div class="settings-option"><label>Tema do sistema</label><select data-setting="theme"><option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>Escuro</option><option value="light" ${settings.theme === 'light' ? 'selected' : ''}>Claro</option><option value="glass" ${settings.theme === 'glass' ? 'selected' : ''}>Glass</option><option value="retro" ${settings.theme === 'retro' ? 'selected' : ''}>Retro</option><option value="cyberpunk" ${settings.theme === 'cyberpunk' ? 'selected' : ''}>Cyberpunk</option></select></div></div><div class="settings-section"><h3>🖼️ Papel de Parede</h3><div class="wallpaper-grid">${wallpaperOptionsHTML}</div><div class="wallpaper-custom-input"><input type="text" placeholder="URL de imagem personalizada..." id="custom-wallpaper-url"><button id="apply-custom-wallpaper">Aplicar</button></div></div><div class="settings-section"><h3>✨ Aparência</h3><div class="settings-option"><label>Transparência</label><input type="range" min="50" max="100" value="${Math.round(settings.transparency * 100)}" data-setting="transparency"></div><div class="settings-option"><label>Desfoque (Blur)</label><input type="range" min="0" max="40" value="${settings.blur}" data-setting="blur"></div><div class="settings-option"><label>Modo Leve</label><button id="toggle-light-mode" style="padding:6px 14px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:6px;cursor:pointer;font-size:12px;">${PerformanceOptimizer.mode === 'light' ? 'Desativar' : 'Ativar'}</button></div></div><div class="settings-section"><h3>ℹ️ Sobre o GlassOS</h3><div class="settings-option"><label>Versão</label><span style="font-size:13px; color:var(--text-secondary);">GlassOS v1.1</span></div></div><div class="settings-section"><h3>🗃️ Dados</h3><div class="settings-option"><label>Limpar dados</label><button id="btn-clear-data" style="padding:6px 14px; border:1px solid var(--danger-color); background:transparent; color:var(--danger-color); border-radius:6px; cursor:pointer; font-size:12px;">Limpar</button></div></div></div>`;
-    const winData = WindowManager.create('settings', 'Configurações', '⚙️', html, { width: 550, height: 580 });
+    const html = `<div class="settings-container"><div class="settings-section"><h3>${renderIcon('paint', 20)} Tema</h3><div class="settings-option"><label>Tema do sistema</label><select data-setting="theme"><option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>Escuro</option><option value="light" ${settings.theme === 'light' ? 'selected' : ''}>Claro</option><option value="glass" ${settings.theme === 'glass' ? 'selected' : ''}>Glass</option><option value="retro" ${settings.theme === 'retro' ? 'selected' : ''}>Retro</option><option value="cyberpunk" ${settings.theme === 'cyberpunk' ? 'selected' : ''}>Cyberpunk</option></select></div></div><div class="settings-section"><h3>${renderIcon('imageeditor', 20)} Papel de Parede</h3><div class="wallpaper-grid">${wallpaperOptionsHTML}</div><div class="wallpaper-custom-input"><input type="text" placeholder="URL de imagem personalizada..." id="custom-wallpaper-url"><button id="apply-custom-wallpaper">Aplicar</button></div></div><div class="settings-section"><h3>✨ Aparência</h3><div class="settings-option"><label>Transparência</label><input type="range" min="50" max="100" value="${Math.round(settings.transparency * 100)}" data-setting="transparency"></div><div class="settings-option"><label>Desfoque (Blur)</label><input type="range" min="0" max="40" value="${settings.blur}" data-setting="blur"></div><div class="settings-option"><label>Modo Leve</label><button id="toggle-light-mode" style="padding:6px 14px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:6px;cursor:pointer;font-size:12px;">${PerformanceOptimizer.mode === 'light' ? 'Desativar' : 'Ativar'}</button></div></div><div class="settings-section"><h3>${renderIcon('sysmon', 20)} Sobre o GlassOS</h3><div class="settings-option"><label>Versão</label><span style="font-size:13px; color:var(--text-secondary);">GlassOS v1.1</span></div></div><div class="settings-section"><h3>🗃️ Dados</h3><div class="settings-option"><label>Limpar dados</label><button id="btn-clear-data" style="padding:6px 14px; border:1px solid var(--danger-color); background:transparent; color:var(--danger-color); border-radius:6px; cursor:pointer; font-size:12px;">Limpar</button></div></div></div>`;
+    const winData = WindowManager.create('settings', 'Configurações', GlassIcons.settings, html, { width: 550, height: 580 });
     winData.element.querySelector('[data-setting="theme"]').addEventListener('change', (e) => { ThemeManager.apply(e.target.value); });
     winData.element.querySelectorAll('.wallpaper-option').forEach(opt => { opt.addEventListener('click', () => { winData.element.querySelectorAll('.wallpaper-option').forEach(o => o.classList.remove('selected')); opt.classList.add('selected'); ThemeManager.applyWallpaper(opt.dataset.wallpaper); }); });
     winData.element.querySelector('#apply-custom-wallpaper').addEventListener('click', () => { const url = winData.element.querySelector('#custom-wallpaper-url').value.trim(); if (url) { winData.element.querySelectorAll('.wallpaper-option').forEach(o => o.classList.remove('selected')); ThemeManager.applyWallpaper(url); } });
@@ -799,7 +870,7 @@ Apps.Settings = function() {
 
 Apps.Terminal = function() {
     const html = `<div class="terminal-container"><div class="terminal-output"></div><div class="terminal-input-line"><span class="terminal-prompt">user@glassos:~$</span><input type="text" class="terminal-input" autofocus spellcheck="false"></div></div>`;
-    const winData = WindowManager.create('terminal', 'Terminal', '💻', html, { width: 650, height: 400 });
+    const winData = WindowManager.create('terminal', 'Terminal', GlassIcons.terminal, html, { width: 650, height: 400 });
     const output = winData.element.querySelector('.terminal-output'), input = winData.element.querySelector('.terminal-input'), commandHistory = []; let historyIndex = -1;
     function print(text, className = 'cmd-line') { const line = document.createElement('div'); line.className = className; line.textContent = text; output.appendChild(line); output.scrollTop = output.scrollHeight; }
     print('GlassOS Terminal v1.1', 'cmd-info'); print('Digite "help" para ver os comandos.', 'cmd-warn'); print('');
@@ -812,7 +883,7 @@ Apps.Terminal = function() {
             case 'clear': output.innerHTML = ''; break;
             case 'date': print(new Date().toLocaleString('pt-BR')); break;
             case 'echo': print(args.join(' ')); break;
-            case 'ls': { const fs = FileSystem.getFS(); const path = args[0] || '/'; const node = FileSystem.getNode(fs, path); if (!node || node.type !== 'folder') { print(`ls: ${path}: Não existe`, 'cmd-error'); } else { const entries = Object.entries(node.children || {}); if (entries.length === 0) print('(vazio)'); else entries.forEach(([name, item]) => { const prefix = item.type === 'folder' ? '📁' : '📄'; print(`  ${prefix} ${name}`); }); } break; }
+            case 'ls': { const fs = FileSystem.getFS(); const path = args[0] || '/'; const node = FileSystem.getNode(fs, path); if (!node || node.type !== 'folder') { print(`ls: ${path}: Não existe`, 'cmd-error'); } else { const entries = Object.entries(node.children || {}); if (entries.length === 0) print('(vazio)'); else entries.forEach(([name, item]) => { const prefix = item.type === 'folder' ? renderIcon('files', 16) : renderIcon('clipboard', 16); print(`${prefix} ${name}`); }); } break; }
             case 'theme': { const theme = args[0]?.toLowerCase(); if (['dark', 'light', 'glass', 'retro', 'cyberpunk'].includes(theme)) { ThemeManager.apply(theme); print(`Tema: ${theme}`, 'cmd-info'); } else print('Uso: theme [dark|light|glass|retro|cyberpunk]', 'cmd-error'); break; }
             case 'sysinfo': print('GlassOS v1.1', 'cmd-info'); print(`Navegador: ${navigator.userAgent.split(' ').slice(-1)[0]}`); print(`Tema: ${document.documentElement.getAttribute('data-theme')}`); print(`Janelas: ${WindowManager.windows.size}`); break;
             case 'reboot': print('Reiniciando...', 'cmd-warn'); setTimeout(() => location.reload(), 1500); break;
@@ -831,8 +902,8 @@ Apps.Terminal = function() {
 
 // NOVOS APLICATIVOS
 Apps.Clock = function() {
-    const html = `<div class="clock-app-container"><div class="clock-tabs"><button class="clock-tab active" data-tab="clock">🕐 Relógio</button><button class="clock-tab" data-tab="alarm">⏰ Alarme</button><button class="clock-tab" data-tab="stopwatch">⏱️ Cronômetro</button></div><div class="clock-content" id="clock-content"><div class="clock-display" id="clock-display">00:00:00</div></div></div>`;
-    const winData = WindowManager.create('clock', 'Relógio', '🕐', html, { width: 400, height: 350 });
+    const html = `<div class="clock-app-container"><div class="clock-tabs"><button class="clock-tab active" data-tab="clock">${renderIcon('clock', 16)} Relógio</button><button class="clock-tab" data-tab="alarm">${renderIcon('notifications', 16)} Alarme</button><button class="clock-tab" data-tab="stopwatch">${renderIcon('clock', 16)} Cronômetro</button></div><div class="clock-content" id="clock-content"><div class="clock-display" id="clock-display">00:00:00</div></div></div>`;
+    const winData = WindowManager.create('clock', 'Relógio', GlassIcons.clock, html, { width: 400, height: 350 });
     const content = winData.element.querySelector('#clock-content'), display = winData.element.querySelector('#clock-display');
     let alarms = Storage.get('alarms', []), stopwatchInterval = null, stopwatchSeconds = 0;
     winData.element.querySelectorAll('.clock-tab').forEach(tab => {
@@ -865,7 +936,7 @@ Apps.Clock = function() {
 
 Apps.Calendar = function() {
     const html = `<div class="calendar-container" id="calendar-app"></div>`;
-    const winData = WindowManager.create('calendar', 'Calendário', '📅', html, { width: 500, height: 550 });
+    const winData = WindowManager.create('calendar', 'Calendário', GlassIcons.calendar, html, { width: 500, height: 550 });
     const container = winData.element.querySelector('#calendar-app');
     let currentDate = new Date(), events = Storage.get('events', []);
     function render() {
@@ -884,7 +955,7 @@ Apps.Calendar = function() {
 
 Apps.SystemMonitor = function() {
     const html = `<div class="sysmon-container"><div class="sysmon-item"><div class="sysmon-label"><span>CPU</span><span id="sys-cpu-val">0%</span></div><div class="sysmon-bar"><div class="sysmon-fill" id="sys-cpu-bar" style="width:0%"></div></div></div><div class="sysmon-item"><div class="sysmon-label"><span>Memória RAM</span><span id="sys-ram-val">0%</span></div><div class="sysmon-bar"><div class="sysmon-fill" id="sys-ram-bar" style="width:0%"></div></div></div><div class="sysmon-item"><div class="sysmon-label"><span>Armazenamento</span><span id="sys-disk-val">0%</span></div><div class="sysmon-bar"><div class="sysmon-fill" id="sys-disk-bar" style="width:0%"></div></div></div><div class="sysmon-stats"><div class="sysmon-stat"><div class="sysmon-stat-value" id="sys-uptime">00:00:00</div><div class="sysmon-stat-label">Tempo Ativo</div></div><div class="sysmon-stat"><div class="sysmon-stat-value" id="sys-processes">0</div><div class="sysmon-stat-label">Processos</div></div></div></div>`;
-    const winData = WindowManager.create('sysmon', 'Monitor de Sistema', '📊', html, { width: 450, height: 400 });
+    const winData = WindowManager.create('sysmon', 'Monitor de Sistema', GlassIcons.sysmon, html, { width: 450, height: 400 });
     let startTime = Date.now();
     function update() {
         const cpu = Math.floor(Math.random() * 50) + 10, ram = Math.floor(Math.random() * 40) + 30, disk = Math.min(Math.floor((Object.keys(localStorage).length / 100) * 100), 100);
@@ -900,8 +971,8 @@ Apps.SystemMonitor = function() {
 };
 
 Apps.ImageEditor = function() {
-    const html = `<div class="image-editor-container"><div class="image-editor-toolbar"><button id="img-upload" style="padding:6px 12px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:4px;cursor:pointer;">📂 Abrir</button><button id="img-save" style="padding:6px 12px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:4px;cursor:pointer;">💾 Salvar</button><select id="img-filter" style="padding:6px;border:1px solid var(--border-color);background:var(--input-bg);color:var(--text-primary);border-radius:4px;"><option value="none">Sem Filtro</option><option value="grayscale">Preto e Branco</option><option value="sepia">Sépia</option><option value="blur">Desfoque</option></select></div><div class="image-editor-canvas-container"><canvas id="img-canvas" class="image-editor-canvas" width="800" height="600"></canvas></div></div>`;
-    const winData = WindowManager.create('imageeditor', 'Editor de Imagens', '🎨', html, { width: 900, height: 700 });
+    const html = `<div class="image-editor-container"><div class="image-editor-toolbar"><button id="img-upload" style="padding:6px 12px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:4px;cursor:pointer;">${renderIcon('files', 16)} Abrir</button><button id="img-save" style="padding:6px 12px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:4px;cursor:pointer;">${renderIcon('clipboard', 16)} Salvar</button><select id="img-filter" style="padding:6px;border:1px solid var(--border-color);background:var(--input-bg);color:var(--text-primary);border-radius:4px;"><option value="none">Sem Filtro</option><option value="grayscale">Preto e Branco</option><option value="sepia">Sépia</option><option value="blur">Desfoque</option></select></div><div class="image-editor-canvas-container"><canvas id="img-canvas" class="image-editor-canvas" width="800" height="600"></canvas></div></div>`;
+    const winData = WindowManager.create('imageeditor', 'Editor de Imagens', GlassIcons.imageeditor, html, { width: 900, height: 700 });
     const canvas = winData.element.querySelector('#img-canvas'), ctx = canvas.getContext('2d'); let originalImage = null;
     ctx.fillStyle = 'white'; ctx.fillRect(0, 0, canvas.width, canvas.height);
     document.getElementById('img-upload').addEventListener('click', () => { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.addEventListener('change', (e) => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (event) => { const img = new Image(); img.onload = () => { originalImage = img; canvas.width = img.width; canvas.height = img.height; ctx.drawImage(img, 0, 0); }; img.src = event.target.result; }; reader.readAsDataURL(file); } }); input.click(); });
@@ -910,8 +981,8 @@ Apps.ImageEditor = function() {
 };
 
 Apps.MusicPlayer = function() {
-    const html = `<div class="music-player-container"><div class="music-player-cover">🎵</div><div class="music-player-info"><div class="music-player-title">Nenhuma música</div><div class="music-player-artist">Selecione um arquivo</div></div><div class="music-player-controls"><button class="music-player-btn" id="mp-prev">⏮</button><button class="music-player-btn play" id="mp-play">▶</button><button class="music-player-btn" id="mp-next">⏭</button></div><div class="music-player-progress"><div class="music-player-bar" id="mp-bar"><div class="music-player-bar-fill" id="mp-bar-fill"></div></div><div class="music-player-time"><span id="mp-current">0:00</span><span id="mp-duration">0:00</span></div></div><button id="mp-upload" style="width:100%;padding:10px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:6px;cursor:pointer;">📂 Abrir Música</button></div>`;
-    const winData = WindowManager.create('musicplayer', 'Player de Música', '🎵', html, { width: 380, height: 550 });
+    const html = `<div class="music-player-container"><div class="music-player-cover">${renderIcon('musicplayer', 48)}</div><div class="music-player-info"><div class="music-player-title">Nenhuma música</div><div class="music-player-artist">Selecione um arquivo</div></div><div class="music-player-controls"><button class="music-player-btn" id="mp-prev">⏮</button><button class="music-player-btn play" id="mp-play">▶</button><button class="music-player-btn" id="mp-next">⏭</button></div><div class="music-player-progress"><div class="music-player-bar" id="mp-bar"><div class="music-player-bar-fill" id="mp-bar-fill"></div></div><div class="music-player-time"><span id="mp-current">0:00</span><span id="mp-duration">0:00</span></div></div><button id="mp-upload" style="width:100%;padding:10px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:6px;cursor:pointer;">${renderIcon('files', 16)} Abrir Música</button></div>`;
+    const winData = WindowManager.create('musicplayer', 'Player de Música', GlassIcons.musicplayer, html, { width: 380, height: 550 });
     const audio = new Audio(); let isPlaying = false;
     document.getElementById('mp-upload').addEventListener('click', () => { const input = document.createElement('input'); input.type = 'file'; input.accept = 'audio/*'; input.addEventListener('change', (e) => { const file = e.target.files[0]; if (file) { const url = URL.createObjectURL(file); audio.src = url; document.querySelector('.music-player-title').textContent = file.name.replace(/\.[^/.]+$/, ""); document.querySelector('.music-player-artist').textContent = 'Arquivo local'; } }); input.click(); });
     document.getElementById('mp-play').addEventListener('click', () => { if (!audio.src) return; if (isPlaying) { audio.pause(); document.getElementById('mp-play').textContent = '▶'; } else { audio.play(); document.getElementById('mp-play').textContent = '⏸'; } isPlaying = !isPlaying; });
@@ -921,8 +992,8 @@ Apps.MusicPlayer = function() {
 };
 
 Apps.Paint = function() {
-    const html = `<div class="paint-container"><div class="paint-toolbar"><input type="color" class="paint-color-picker" id="paint-color" value="#000000"><input type="range" class="paint-size-slider" id="paint-size" min="1" max="50" value="5"><button id="paint-brush" style="padding:6px 12px;border:1px solid var(--border-color);background:var(--accent-color);color:white;border-radius:4px;cursor:pointer;">🖌️ Pincel</button><button id="paint-eraser" style="padding:6px 12px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:4px;cursor:pointer;">🧹 Borracha</button><button id="paint-clear" style="padding:6px 12px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:4px;cursor:pointer;">🗑️ Limpar</button><button id="paint-save" style="padding:6px 12px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:4px;cursor:pointer;">💾 Salvar</button></div><div class="paint-canvas-container"><canvas id="paint-canvas" class="paint-canvas" width="800" height="600"></canvas></div></div>`;
-    const winData = WindowManager.create('paint', 'Paint', '🖌️', html, { width: 900, height: 700 });
+    const html = `<div class="paint-container"><div class="paint-toolbar"><input type="color" class="paint-color-picker" id="paint-color" value="#000000"><input type="range" class="paint-size-slider" id="paint-size" min="1" max="50" value="5"><button id="paint-brush" style="padding:6px 12px;border:1px solid var(--border-color);background:var(--accent-color);color:white;border-radius:4px;cursor:pointer;">${renderIcon('paint', 16)} Pincel</button><button id="paint-eraser" style="padding:6px 12px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:4px;cursor:pointer;">${renderIcon('clipboard', 16)} Borracha</button><button id="paint-clear" style="padding:6px 12px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:4px;cursor:pointer;">${renderIcon('close', 16)} Limpar</button><button id="paint-save" style="padding:6px 12px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:4px;cursor:pointer;">${renderIcon('clipboard', 16)} Salvar</button></div><div class="paint-canvas-container"><canvas id="paint-canvas" class="paint-canvas" width="800" height="600"></canvas></div></div>`;
+    const winData = WindowManager.create('paint', 'Paint', GlassIcons.paint, html, { width: 900, height: 700 });
     const canvas = winData.element.querySelector('#paint-canvas'), ctx = canvas.getContext('2d'); let isDrawing = false, lastX = 0, lastY = 0, tool = 'brush';
     ctx.fillStyle = 'white'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     function getPos(e) { const rect = canvas.getBoundingClientRect(); return { x: e.clientX - rect.left, y: e.clientY - rect.top }; }
@@ -939,18 +1010,18 @@ Apps.Paint = function() {
 // ===== REGISTRO DE APLICATIVOS =====
 const AppRegistry = {
     apps: [
-        { id: 'notepad', name: 'Bloco de Notas', icon: '📝', createApp: Apps.Notepad },
-        { id: 'calculator', name: 'Calculadora', icon: '🧮', createApp: Apps.Calculator },
-        { id: 'files', name: 'Arquivos', icon: '📁', createApp: Apps.FileManager },
-        { id: 'browser', name: 'Navegador', icon: '🌐', createApp: Apps.Browser },
-        { id: 'settings', name: 'Configurações', icon: '⚙️', createApp: Apps.Settings },
-        { id: 'terminal', name: 'Terminal', icon: '💻', createApp: Apps.Terminal },
-        { id: 'clock', name: 'Relógio', icon: '🕐', createApp: Apps.Clock },
-        { id: 'calendar', name: 'Calendário', icon: '📅', createApp: Apps.Calendar },
-        { id: 'sysmon', name: 'Monitor', icon: '📊', createApp: Apps.SystemMonitor },
-        { id: 'imageeditor', name: 'Imagens', icon: '🎨', createApp: Apps.ImageEditor },
-        { id: 'musicplayer', name: 'Música', icon: '🎵', createApp: Apps.MusicPlayer },
-        { id: 'paint', name: 'Paint', icon: '🖌️', createApp: Apps.Paint },
+        { id: 'notepad', name: 'Bloco de Notas', icon: GlassIcons.notepad, createApp: Apps.Notepad },
+        { id: 'calculator', name: 'Calculadora', icon: GlassIcons.calculator, createApp: Apps.Calculator },
+        { id: 'files', name: 'Arquivos', icon: GlassIcons.files, createApp: Apps.FileManager },
+        { id: 'browser', name: 'Navegador', icon: GlassIcons.browser, createApp: Apps.Browser },
+        { id: 'settings', name: 'Configurações', icon: GlassIcons.settings, createApp: Apps.Settings },
+        { id: 'terminal', name: 'Terminal', icon: GlassIcons.terminal, createApp: Apps.Terminal },
+        { id: 'clock', name: 'Relógio', icon: GlassIcons.clock, createApp: Apps.Clock },
+        { id: 'calendar', name: 'Calendário', icon: GlassIcons.calendar, createApp: Apps.Calendar },
+        { id: 'sysmon', name: 'Monitor', icon: GlassIcons.sysmon, createApp: Apps.SystemMonitor },
+        { id: 'imageeditor', name: 'Imagens', icon: GlassIcons.imageeditor, createApp: Apps.ImageEditor },
+        { id: 'musicplayer', name: 'Música', icon: GlassIcons.musicplayer, createApp: Apps.MusicPlayer },
+        { id: 'paint', name: 'Paint', icon: GlassIcons.paint, createApp: Apps.Paint },
     ],
     open(appId) {
         const app = this.apps.find(a => a.id === appId);
@@ -966,7 +1037,7 @@ const AppRegistry = {
         filtered.forEach(app => {
             const el = document.createElement('div');
             el.className = 'start-app-item';
-            el.innerHTML = `<span class="app-icon">${app.icon}</span><span class="app-name">${app.name}</span>`;
+            el.innerHTML = `${renderIcon(app.id, 24)}<span class="app-name">${app.name}</span>`;
             el.addEventListener('click', () => this.open(app.id));
             container.appendChild(el);
         });
@@ -977,7 +1048,7 @@ const AppRegistry = {
         this.apps.forEach(app => {
             const el = document.createElement('div');
             el.className = 'desktop-icon';
-            el.innerHTML = `<span class="icon">${app.icon}</span><span class="label">${app.name}</span>`;
+            el.innerHTML = `${renderIcon(app.id, 32)}<span class="label">${app.name}</span>`;
             el.addEventListener('dblclick', () => this.open(app.id));
             container.appendChild(el);
         });
@@ -995,7 +1066,8 @@ const GlassOS = {
         AppRegistry.renderStartMenu();
         this.startClock();
         this.setupGlobalEvents();
-        // Inicializar novos sistemas
+        // Inicializar novos sistemas e renderizar ícones SVG nos elementos do HTML
+        this.renderStaticIcons();
         NotificationSystem.setupEvents();
         ClipboardManager.init();
         GlobalSearch.init();
@@ -1005,6 +1077,21 @@ const GlassOS = {
         PerformanceOptimizer.init();
         SnapLayouts.init();
         console.log('GlassOS v1.1 inicializado com todas as funcionalidades.');
+    },
+    renderStaticIcons() {
+        // Renderizar ícones SVG nos elementos estáticos do HTML
+        const ctxWallpaper = document.getElementById('ctx-wallpaper-icon');
+        if (ctxWallpaper) ctxWallpaper.innerHTML = renderIcon('imageeditor', 18);
+        const ctxSettings = document.getElementById('ctx-settings-icon');
+        if (ctxSettings) ctxSettings.innerHTML = renderIcon('settings', 18);
+        const notifHeaderIcon = document.getElementById('notif-header-icon');
+        if (notifHeaderIcon) notifHeaderIcon.innerHTML = renderIcon('notifications', 18);
+        const clipboardHeaderIcon = document.getElementById('clipboard-header-icon');
+        if (clipboardHeaderIcon) clipboardHeaderIcon.innerHTML = renderIcon('clipboard', 18);
+        const trayClipboard = document.getElementById('tray-clipboard');
+        if (trayClipboard) trayClipboard.innerHTML = renderIcon('clipboard', 16);
+        const trayNotifications = document.getElementById('tray-notifications');
+        if (trayNotifications) trayNotifications.innerHTML = renderIcon('notifications', 16);
     },
     startClock() {
         const clockEl = document.getElementById('tray-clock'), dateEl = document.getElementById('tray-date');
