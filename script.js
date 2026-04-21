@@ -702,23 +702,61 @@ const FileSystem = {
 
 // ===== SISTEMA DE NOTIFICAÇÕES =====
 const NotificationSystem = {
-    notifications: [], focusMode: false,
+    notifications: [], 
+    focusMode: false,
+    
+    init() {
+        // Carregar estado do foco do localStorage
+        const savedFocus = localStorage.getItem('glassos_focus_mode');
+        if (savedFocus === 'true') {
+            this.focusMode = true;
+            document.body.classList.add('focus-mode');
+        }
+        this.render();
+        this.updateBadge();
+    },
+    
     show(title, message, type = 'info', duration = 5000) {
-        if (this.focusMode && type !== 'urgent') return;
+        // Se estiver em modo foco e não for urgente, apenas adiciona ao centro (sem toast)
+        if (this.focusMode && type !== 'urgent') {
+            const id = Date.now();
+            this.notifications.unshift({ id, title, message, type, time: new Date() });
+            this.render();
+            this.updateBadge();
+            if (duration > 0) setTimeout(() => this.dismiss(id), duration);
+            return id;
+        }
+        
         const id = Date.now();
         this.notifications.unshift({ id, title, message, type, time: new Date() });
-        this.render(); this.showToast(title, message, type); this.updateBadge();
+        this.render(); 
+        this.showToast(title, message, type); 
+        this.updateBadge();
         if (duration > 0) setTimeout(() => this.dismiss(id), duration);
         return id;
     },
-    dismiss(id) { this.notifications = this.notifications.filter(n => n.id !== id); this.render(); this.updateBadge(); },
-    clearAll() { this.notifications = []; this.render(); this.updateBadge(); },
+    
+    dismiss(id) { 
+        this.notifications = this.notifications.filter(n => n.id !== id); 
+        this.render(); 
+        this.updateBadge(); 
+    },
+    
+    clearAll() { 
+        this.notifications = []; 
+        this.render(); 
+        this.updateBadge(); 
+    },
+    
     toggleFocusMode() {
         this.focusMode = !this.focusMode;
         document.body.classList.toggle('focus-mode', this.focusMode);
         document.getElementById('notif-focus-mode')?.classList.toggle('active', this.focusMode);
+        // Salvar no localStorage
+        localStorage.setItem('glassos_focus_mode', this.focusMode.toString());
         this.show('Modo Foco', this.focusMode ? 'Notificações silenciadas' : 'Notificações ativadas', 'info', 3000);
     },
+    
     render() {
         const list = document.getElementById('notification-list');
         if (!list) return;
@@ -737,14 +775,18 @@ const NotificationSystem = {
             item.addEventListener('click', () => this.dismiss(parseInt(item.dataset.id)));
         });
     },
+    
     updateBadge() {
         const count = this.notifications.length;
         const badge = document.getElementById('tray-notifications');
         if (badge) badge.innerHTML = count > 0 ? renderIcon('notifications', 16) + `<span style="margin-left:4px">${count}</span>` : renderIcon('notifications', 16);
     },
+    
     showToast(title, message, type) {
-        // Tocar som de notificação
-        SoundManager.play('notification');
+        // Tocar som de notificação (se SoundManager estiver disponível)
+        if (typeof SoundManager !== 'undefined') {
+            try { SoundManager.play('notification'); } catch(e) {}
+        }
         
         const container = document.getElementById('toast-container');
         if (!container) return;
@@ -757,10 +799,13 @@ const NotificationSystem = {
         };
         const toast = document.createElement('div');
         toast.className = 'toast';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'polite');
         toast.innerHTML = `<span class="toast-icon">${icons[type] || icons.info}</span><div class="toast-content"><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div>`;
         container.appendChild(toast);
         setTimeout(() => { toast.classList.add('hiding'); setTimeout(() => toast.remove(), 300); }, 4000);
     },
+    
     setupEvents() {
         const notifBtn = document.getElementById('tray-notifications');
         const center = document.getElementById('notification-center');
@@ -878,7 +923,15 @@ const LockScreen = {
             this.isLocked = false;
             document.getElementById('lock-screen').classList.add('hidden');
             NotificationSystem.show('Sistema Desbloqueado', 'Bem-vindo de volta!', 'success', 3000);
-        } else { document.getElementById('lock-error').classList.remove('hidden'); setTimeout(() => document.getElementById('lock-error').classList.add('hidden'), 3000); }
+            // Notificação de boas-vindas após login bem-sucedido
+            setTimeout(() => {
+                NotificationSystem.show('GlassOS', 'Bem-vindo ao GlassOS!', 'success', 5000);
+            }, 500);
+        } else { 
+            document.getElementById('lock-error').classList.remove('hidden'); 
+            NotificationSystem.show('Falha na autenticação', 'Senha incorreta. Tente novamente.', 'error', 3000);
+            setTimeout(() => document.getElementById('lock-error').classList.add('hidden'), 3000); 
+        }
     },
     updateClock() {
         const clock = document.getElementById('lock-clock'); const date = document.getElementById('lock-date');
@@ -1241,10 +1294,16 @@ Apps.Terminal = function() {
         print(`user@glassos:~$ ${trimmed}`); commandHistory.unshift(trimmed); if (commandHistory.length > 50) commandHistory.pop(); historyIndex = -1;
         const parts = trimmed.split(/\s+/), command = parts[0].toLowerCase(), args = parts.slice(1);
         switch (command) {
-            case 'help': print('Comandos: help, clear, date, echo, ls, theme, sysinfo, reboot, calc, whoami, history, neofetch, lock, perf', 'cmd-info'); break;
+            case 'help': print('Comandos: help, clear, date, echo, ls, theme, sysinfo, reboot, calc, whoami, history, neofetch, lock, perf, notify', 'cmd-info'); break;
             case 'clear': output.innerHTML = ''; break;
             case 'date': print(new Date().toLocaleString('pt-BR')); break;
             case 'echo': print(args.join(' ')); break;
+            case 'notify': { 
+                const text = args.join(' '); 
+                if (!text) { print('Uso: notify <mensagem>', 'cmd-error'); } 
+                else { NotificationSystem.show('Terminal', text, 'info', 5000); print('Notificação enviada!', 'cmd-success'); } 
+                break; 
+            }
             case 'ls': { const fs = FileSystem.getFS(); const path = args[0] || '/'; const node = FileSystem.getNode(fs, path); if (!node || node.type !== 'folder') { print(`ls: ${path}: Não existe`, 'cmd-error'); } else { const entries = Object.entries(node.children || {}); if (entries.length === 0) print('(vazio)'); else entries.forEach(([name, item]) => { const prefix = item.type === 'folder' ? renderIcon('files', 16) : renderIcon('clipboard', 16); print(`${prefix} ${name}`); }); } break; }
             case 'theme': { const theme = args[0]?.toLowerCase(); if (['dark', 'light', 'glass', 'retro', 'cyberpunk'].includes(theme)) { ThemeManager.apply(theme); print(`Tema: ${theme}`, 'cmd-info'); } else print('Uso: theme [dark|light|glass|retro|cyberpunk]', 'cmd-error'); break; }
             case 'sysinfo': print('GlassOS v1.1', 'cmd-info'); print(`Navegador: ${navigator.userAgent.split(' ').slice(-1)[0]}`); print(`Tema: ${document.documentElement.getAttribute('data-theme')}`); print(`Janelas: ${WindowManager.windows.size}`); break;
@@ -1430,6 +1489,7 @@ const GlassOS = {
         this.setupGlobalEvents();
         // Inicializar novos sistemas e renderizar ícones SVG nos elementos do HTML
         this.renderStaticIcons();
+        NotificationSystem.init();
         NotificationSystem.setupEvents();
         ClipboardManager.init();
         GlobalSearch.init();
@@ -1685,8 +1745,8 @@ const QuickSettingsManager = {
                 focusToggle.setAttribute('data-state', isActive.toString());
                 
                 // Integra com sistema de notificações
-                if (typeof GlassOS.notificationSystem !== 'undefined') {
-                    GlassOS.notificationSystem.toggleFocusMode();
+                if (typeof NotificationSystem !== 'undefined') {
+                    NotificationSystem.toggleFocusMode();
                 }
                 
                 // Sincroniza estado visual
