@@ -862,38 +862,136 @@ const GlobalSearch = {
     }
 };
 
-// ===== TELA DE BLOQUEIO =====
-const LockScreen = {
-    password: '1234', isLocked: false,
-    init() { this.setupEvents(); this.updateClock(); setInterval(() => this.updateClock(), 1000); },
-    lock() {
-        this.isLocked = true;
-        document.getElementById('lock-screen').classList.remove('hidden');
-        document.getElementById('lock-password').value = '';
-        document.getElementById('lock-error').classList.add('hidden');
-        NotificationSystem.show('Sistema Bloqueado', 'Digite a senha para desbloquear', 'info', 0);
+// ===== TELA DE LOGIN (REDESIGNADA) =====
+const LoginManager = {
+    password: '1234',
+    failedAttempts: 0,
+    clockInterval: null,
+
+    init() {
+        this.setupEventListeners();
+        this.startLoginClock();
+        this.showLoginScreen();
+        
+        setTimeout(() => {
+            document.getElementById('login-password').focus();
+        }, 100);
     },
-    unlock(password) {
-        if (password === this.password) {
-            this.isLocked = false;
-            document.getElementById('lock-screen').classList.add('hidden');
-            NotificationSystem.show('Sistema Desbloqueado', 'Bem-vindo de volta!', 'success', 3000);
-        } else { document.getElementById('lock-error').classList.remove('hidden'); setTimeout(() => document.getElementById('lock-error').classList.add('hidden'), 3000); }
+
+    setupEventListeners() {
+        const passwordInput = document.getElementById('login-password');
+        const submitBtn = document.getElementById('login-submit');
+        const shutdownBtn = document.getElementById('login-shutdown');
+
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.attemptLogin();
+            }
+        });
+
+        submitBtn.addEventListener('click', () => {
+            this.attemptLogin();
+        });
+
+        shutdownBtn.addEventListener('click', () => {
+            if (confirm('Tem certeza que deseja desligar o sistema?')) {
+                location.reload();
+            }
+        });
     },
+
+    startLoginClock() {
+        this.updateClock();
+        this.clockInterval = setInterval(() => {
+            this.updateClock();
+        }, 1000);
+    },
+
     updateClock() {
-        const clock = document.getElementById('lock-clock'); const date = document.getElementById('lock-date');
-        if (!clock || !date) return;
         const now = new Date();
-        clock.textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        date.textContent = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        const timeElement = document.getElementById('login-time');
+        const dateElement = document.getElementById('login-date');
+        
+        if (!timeElement || !dateElement) return;
+        
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        timeElement.textContent = `${hours}:${minutes}`;
+        
+        const options = { 
+            weekday: 'long', 
+            day: 'numeric', 
+            month: 'long', 
+            year: 'numeric' 
+        };
+        dateElement.textContent = now.toLocaleDateString('pt-BR', options);
     },
-    setupEvents() {
-        document.getElementById('lock-unlock')?.addEventListener('click', () => { const pwd = document.getElementById('lock-password').value; this.unlock(pwd); });
-        document.getElementById('lock-password')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') this.unlock(e.target.value); });
-        document.getElementById('lock-shutdown')?.addEventListener('click', () => GlassOS.shutdown('Desligando...'));
-        let idleTimer;
-        const resetTimer = () => { clearTimeout(idleTimer); if (!this.isLocked) idleTimer = setTimeout(() => this.lock(), 300000); };
-        document.addEventListener('mousemove', resetTimer); document.addEventListener('keypress', resetTimer); document.addEventListener('click', resetTimer); resetTimer();
+
+    attemptLogin() {
+        const passwordInput = document.getElementById('login-password');
+        const enteredPassword = passwordInput.value;
+
+        if (enteredPassword === this.password) {
+            this.loginSuccess();
+        } else {
+            this.loginFailed();
+        }
+    },
+
+    loginSuccess() {
+        SoundManager.play('openWindow');
+        
+        const loginScreen = document.getElementById('login-screen');
+        loginScreen.classList.add('slide-up');
+        
+        setTimeout(() => {
+            document.getElementById('desktop').classList.remove('hidden');
+            document.getElementById('taskbar').style.display = 'flex';
+            
+            GlassOS.startSystem();
+            this.cleanup();
+        }, 800);
+    },
+
+    loginFailed() {
+        SoundManager.play('error');
+        
+        this.failedAttempts++;
+        
+        const errorElement = document.getElementById('login-error');
+        const passwordInput = document.getElementById('login-password');
+        
+        errorElement.classList.remove('hidden');
+        passwordInput.classList.add('shake');
+        
+        setTimeout(() => {
+            passwordInput.classList.remove('shake');
+        }, 500);
+        
+        passwordInput.value = '';
+        passwordInput.focus();
+        
+        if (this.failedAttempts >= 5) {
+            alert('Sistema bloqueado após 5 tentativas falhas. Reiniciando...');
+            location.reload();
+        }
+    },
+
+    showLoginScreen() {
+        const loginScreen = document.getElementById('login-screen');
+        loginScreen.classList.remove('hidden');
+        loginScreen.style.opacity = '0';
+        
+        setTimeout(() => {
+            loginScreen.style.transition = 'opacity 0.8s ease-in-out';
+            loginScreen.style.opacity = '1';
+        }, 100);
+    },
+
+    cleanup() {
+        if (this.clockInterval) {
+            clearInterval(this.clockInterval);
+        }
     }
 };
 
@@ -1253,7 +1351,7 @@ Apps.Terminal = function() {
             case 'whoami': print('user'); break;
             case 'history': commandHistory.forEach((cmd, i) => { print(`  ${commandHistory.length - i}  ${cmd}`); }); break;
             case 'neofetch': print(`\n    ╔══════════════╗   user@glassos\n    ║   GlassOS  ║   OS: GlassOS v1.1\n    ║     v1.1    ║   Theme: ${document.documentElement.getAttribute('data-theme')}\n    ╚══════════════╝   Windows: ${WindowManager.windows.size}\n                `, 'cmd-info'); break;
-            case 'lock': LockScreen.lock(); break;
+            case 'lock': alert('Use o botão de desligar no menu iniciar para bloquear a tela.'); break;
             case 'perf': PerformanceOptimizer.toggleLightMode(); print(`Modo performance: ${PerformanceOptimizer.mode}`, 'cmd-info'); break;
             default: print(`Comando nao encontrado: ${command}. Digite "help".`, 'cmd-error');
         }
@@ -1433,7 +1531,6 @@ const GlassOS = {
         NotificationSystem.setupEvents();
         ClipboardManager.init();
         GlobalSearch.init();
-        LockScreen.init();
         WidgetSystem.init();
         UpdateSystem.init();
         PerformanceOptimizer.init();
@@ -1441,11 +1538,6 @@ const GlassOS = {
         
         // Inicializar QuickSettingsManager
         QuickSettingsManager.init();
-        
-        // Mostrar tela de login/bloqueio imediatamente ao iniciar o sistema
-        setTimeout(() => {
-            LockScreen.lock();
-        }, 500);
         
         // Tocar som de boot após inicialização (se áudio já estiver disponível)
         setTimeout(() => {
@@ -1533,7 +1625,7 @@ const GlassOS = {
             if (e.key === 'Meta' || e.key === 'OS') { e.preventDefault(); this.toggleStartMenu(); }
             if (e.altKey && e.key === 'Tab') { e.preventDefault(); if (!document.getElementById('alt-tab-overlay').classList.contains('hidden')) this.cycleAltTab(); else this.showAltTab(); }
             if ((e.ctrlKey && e.shiftKey && e.key === 'F') || (e.key === 'l' && (e.metaKey || e.ctrlKey))) { e.preventDefault(); GlobalSearch.toggle(); }
-            if ((e.key === 'l' || e.key === 'L') && (e.metaKey || e.ctrlKey)) { e.preventDefault(); LockScreen.lock(); }
+            if ((e.key === 'l' || e.key === 'L') && (e.metaKey || e.ctrlKey)) { e.preventDefault(); alert('Use o botão de desligar no menu iniciar para bloquear a tela.'); }
             if (e.key === 'Escape') { this.closeStartMenu(); this.hideContextMenu(); this.hideAltTab(); this.closeAllModals(); QuickSettingsManager.close(); }
         });
         document.addEventListener('keyup', (e) => { if (e.key === 'Alt') this.hideAltTab(); });
@@ -1943,160 +2035,6 @@ const BootManager = {
     }
 };
 
-/* ===== GERENCIADOR DE LOGIN ===== */
-const LoginManager = {
-    password: '1234',
-    loginAttempts: 0,
-    
-    init() {
-        this.setupEventListeners();
-        this.startLoginClock();
-        document.getElementById('login-password').focus();
-    },
-    
-    setupEventListeners() {
-        const loginPassword = document.getElementById('login-password');
-        const loginSubmit = document.getElementById('login-submit');
-        const loginShutdown = document.getElementById('login-shutdown');
-        
-        // Botão de submit
-        loginSubmit.addEventListener('click', () => this.attemptLogin());
-        
-        // Enter no input de senha
-        loginPassword.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.attemptLogin();
-            }
-        });
-        
-        // Botão de desligar
-        loginShutdown.addEventListener('click', () => {
-            if (confirm('Deseja realmente desligar o sistema?')) {
-                this.shutdown();
-            }
-        });
-        
-        // Botões do footer (simulação)
-        document.getElementById('login-accessibility').addEventListener('click', () => {
-            GlassOS.showToast('Opções de acessibilidade');
-        });
-        
-        document.getElementById('login-network').addEventListener('click', () => {
-            GlassOS.showToast('Configurações de rede');
-        });
-    },
-    
-    startLoginClock() {
-        const updateTime = () => {
-            const now = new Date();
-            
-            // Atualiza hora grande
-            const timeElement = document.getElementById('login-time');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            timeElement.textContent = `${hours}:${minutes}`;
-            
-            // Atualiza data completa
-            const dateElement = document.getElementById('login-date');
-            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-            const dateString = now.toLocaleDateString('pt-BR', options);
-            // Capitaliza primeira letra
-            dateElement.textContent = dateString.charAt(0).toUpperCase() + dateString.slice(1);
-        };
-        
-        updateTime();
-        setInterval(updateTime, 1000);
-    },
-    
-    attemptLogin() {
-        const loginPassword = document.getElementById('login-password');
-        const loginError = document.getElementById('login-error');
-        const inputWrapper = document.querySelector('.password-input-wrapper');
-        
-        const enteredPassword = loginPassword.value;
-        
-        if (enteredPassword === this.password) {
-            // Senha correta
-            this.loginSuccess();
-        } else {
-            // Senha incorreta
-            this.loginFailed(inputWrapper, loginError, loginPassword);
-        }
-    },
-    
-    loginSuccess() {
-        const loginScreen = document.getElementById('login-screen');
-        
-        // Toca som de sucesso se disponível
-        if (typeof SoundManager !== 'undefined' && SoundManager.play) {
-            try { SoundManager.play('notification'); } catch(e) {}
-        }
-        
-        // Animação de saída
-        loginScreen.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-        loginScreen.style.opacity = '0';
-        loginScreen.style.transform = 'translateY(-40px)';
-        
-        setTimeout(() => {
-            loginScreen.classList.add('hidden');
-            loginScreen.style.opacity = '';
-            loginScreen.style.transform = '';
-            
-            // Revela desktop e taskbar
-            document.getElementById('desktop').style.display = 'block';
-            document.getElementById('taskbar').style.display = 'flex';
-            
-            // Inicializa o sistema principal
-            GlassOS.startSystem();
-            
-            // Toast de boas-vindas
-            GlassOS.showToast('Bem-vindo ao GlassOS!');
-        }, 600);
-    },
-    
-    loginFailed(inputWrapper, loginError, loginPassword) {
-        this.loginAttempts++;
-        
-        // Toca som de erro se disponível
-        if (typeof SoundManager !== 'undefined' && SoundManager.play) {
-            try { SoundManager.play('error'); } catch(e) {}
-        }
-        
-        // Mostra mensagem de erro
-        loginError.classList.remove('hidden');
-        
-        // Limpa campo de senha
-        loginPassword.value = '';
-        loginPassword.focus();
-        
-        // Esconde mensagem após 3 segundos
-        setTimeout(() => {
-            loginError.classList.add('hidden');
-        }, 3000);
-        
-        // Bloqueia após muitas tentativas
-        if (this.loginAttempts >= 5) {
-            GlassOS.showToast('Muitas tentativas. Aguarde alguns segundos.');
-            inputWrapper.style.pointerEvents = 'none';
-            inputWrapper.style.opacity = '0.5';
-            
-            setTimeout(() => {
-                inputWrapper.style.pointerEvents = 'auto';
-                inputWrapper.style.opacity = '1';
-                this.loginAttempts = 0;
-            }, 5000);
-        }
-    },
-    
-    shutdown() {
-        const loginScreen = document.getElementById('login-screen');
-        loginScreen.style.opacity = '0';
-        
-        setTimeout(() => {
-            document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;font-size:24px;">Sistema desligado.</div>';
-        }, 600);
-    }
-};
 
 // Sobrescreve o init do GlassOS para incluir boot manager
 const originalGlassOSInit = GlassOS.init.bind(GlassOS);
