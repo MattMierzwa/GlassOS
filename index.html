@@ -1,0 +1,135 @@
+<!-- index.html - COMPLETO COM TODAS AS NOVAS FUNCIONALIDADES -->
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlassOS v1.1</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="desktop">
+        <div id="desktop-icons"></div>
+        <div id="window-container"></div>
+        <div id="widgets-container"></div>
+    </div>
+
+    <div id="context-menu" class="glass-panel hidden">
+        <div class="context-item" data-action="refresh">⟳ Atualizar</div>
+        <div class="context-item" data-action="wallpaper">🖼️ Alterar Papel de Parede</div>
+        <div class="context-item" data-action="settings">⚙️ Configurações</div>
+        <div class="context-item" data-action="widget">➕ Adicionar Widget</div>
+        <div class="context-divider"></div>
+        <div class="context-item" data-action="about">ℹ️ Sobre o GlassOS</div>
+    </div>
+
+    <div id="start-menu" class="glass-panel hidden">
+        <div class="start-header">
+            <div class="user-profile">
+                <div class="user-avatar">👤</div>
+                <span class="user-name">Usuário</span>
+            </div>
+            <div class="start-power">
+                <button id="btn-restart" title="Reiniciar">⟳</button>
+                <button id="btn-shutdown" title="Desligar">⏻</button>
+            </div>
+        </div>
+        <div class="start-search">
+            <input type="text" id="start-search-input" placeholder="🔍 Buscar aplicativos...">
+        </div>
+        <div class="start-apps" id="start-apps"></div>
+    </div>
+
+    <div id="alt-tab-overlay" class="hidden">
+        <div id="alt-tab-list"></div>
+    </div>
+
+    <div id="shutdown-screen" class="hidden">
+        <div class="shutdown-content">
+            <div class="shutdown-spinner"></div>
+            <p id="shutdown-text">Desligando...</p>
+        </div>
+    </div>
+
+    <div id="lock-screen" class="hidden">
+        <div class="lock-screen-content">
+            <div class="lock-clock" id="lock-clock">00:00</div>
+            <div class="lock-date" id="lock-date">00/00/0000</div>
+            <div class="lock-input-area">
+                <input type="password" id="lock-password" placeholder="Senha (1234)..." maxlength="20">
+                <button id="lock-unlock">🔓 Desbloquear</button>
+                <button id="lock-shutdown">⏻ Desligar</button>
+            </div>
+            <div id="lock-error" class="lock-error hidden">Senha incorreta!</div>
+        </div>
+    </div>
+
+    <div id="notification-center" class="glass-panel hidden">
+        <div class="notification-header">
+            <h3>🔔 Notificações</h3>
+            <button id="notif-clear-all">Limpar tudo</button>
+        </div>
+        <div id="notification-list"></div>
+        <div class="notification-footer">
+            <button id="notif-focus-mode" class="btn-focus-mode">🌙 Modo Foco</button>
+        </div>
+    </div>
+
+    <div id="clipboard-manager" class="glass-panel hidden">
+        <div class="clipboard-header">
+            <h3>📋 Área de Transferência</h3>
+            <button id="clipboard-clear">Limpar</button>
+        </div>
+        <div id="clipboard-list"></div>
+    </div>
+
+    <div id="global-search" class="hidden">
+        <div class="search-box glass-panel">
+            <input type="text" id="global-search-input" placeholder="🔍 Buscar apps, arquivos, configurações..." autofocus>
+            <div id="global-search-results"></div>
+        </div>
+    </div>
+
+    <div id="update-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3>🔄 Atualização Disponível</h3>
+            <p id="update-content">Nova versão do GlassOS disponível!</p>
+            <div class="modal-actions">
+                <button id="update-later">Depois</button>
+                <button id="update-install" class="primary">Instalar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="lazy-loader" class="hidden">
+        <div class="loader-spinner"></div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <div class="snap-overlay" id="snap-overlay">
+        <div class="snap-zone half-left" data-layout="half-left"></div>
+        <div class="snap-zone half-right" data-layout="half-right"></div>
+    </div>
+
+    <div id="taskbar">
+        <button id="btn-start" title="Menu Iniciar">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <rect x="1" y="1" width="8" height="8" rx="1.5"/>
+                <rect x="11" y="1" width="8" height="8" rx="1.5"/>
+                <rect x="1" y="11" width="8" height="8" rx="1.5"/>
+                <rect x="11" y="11" width="8" height="8" rx="1.5"/>
+            </svg>
+        </button>
+        <div id="taskbar-apps"></div>
+        <div id="taskbar-tray">
+            <span id="tray-clipboard" title="Área de Transferência">📋</span>
+            <span id="tray-notifications" title="Notificações">🔔</span>
+            <span id="tray-clock"></span>
+            <span id="tray-date"></span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
