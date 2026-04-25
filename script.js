@@ -303,6 +303,775 @@ const SoundManager = {
     }
 };
 
+// ===== TEMAS SONOROS (SOUND THEMES) =====
+const soundThemes = {
+    glass: {
+        click: () => SoundManager._playClick(SoundManager.ctx.currentTime),
+        openWindow: () => SoundManager._playOpenWindow(SoundManager.ctx.currentTime),
+        closeWindow: () => SoundManager._playCloseWindow(SoundManager.ctx.currentTime),
+        minimize: () => SoundManager._playMinimize(SoundManager.ctx.currentTime),
+        error: () => SoundManager._playError(SoundManager.ctx.currentTime),
+        notification: () => SoundManager._playNotification(SoundManager.ctx.currentTime),
+        typing: () => SoundManager._playTyping(SoundManager.ctx.currentTime)
+    },
+    mechanical: {
+        click: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(800, SoundManager.ctx.currentTime);
+            gain.gain.setValueAtTime(0.06, SoundManager.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.05);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.05);
+        },
+        openWindow: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(200, SoundManager.ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(400, SoundManager.ctx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.08, SoundManager.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.3);
+        },
+        closeWindow: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(400, SoundManager.ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(200, SoundManager.ctx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.08, SoundManager.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.3);
+        },
+        minimize: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(300, SoundManager.ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, SoundManager.ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.06, SoundManager.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.15);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.15);
+        },
+        error: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(120, SoundManager.ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(80, SoundManager.ctx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.1, SoundManager.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.4);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.4);
+        },
+        notification: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(1200, SoundManager.ctx.currentTime);
+            osc.frequency.setValueAtTime(1600, SoundManager.ctx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.08, SoundManager.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.3);
+        },
+        typing: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(1500, SoundManager.ctx.currentTime);
+            gain.gain.setValueAtTime(0.03, SoundManager.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.02);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.02);
+        }
+    },
+    scifi: {
+        click: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1200, SoundManager.ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(2000, SoundManager.ctx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.05, SoundManager.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.1);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.1);
+        },
+        openWindow: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(300, SoundManager.ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(800, SoundManager.ctx.currentTime + 0.4);
+            gain.gain.setValueAtTime(0, SoundManager.ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.1, SoundManager.ctx.currentTime + 0.2);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.4);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.4);
+        },
+        closeWindow: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, SoundManager.ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(300, SoundManager.ctx.currentTime + 0.4);
+            gain.gain.setValueAtTime(0, SoundManager.ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.1, SoundManager.ctx.currentTime + 0.2);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.4);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.4);
+        },
+        minimize: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, SoundManager.ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(200, SoundManager.ctx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.06, SoundManager.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.2);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.2);
+        },
+        error: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, SoundManager.ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(50, SoundManager.ctx.currentTime + 0.4);
+            gain.gain.setValueAtTime(0.1, SoundManager.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.5);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.5);
+        },
+        notification: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, SoundManager.ctx.currentTime);
+            osc.frequency.setValueAtTime(1100, SoundManager.ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0, SoundManager.ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.12, SoundManager.ctx.currentTime + 0.1);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.4);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.4);
+        },
+        typing: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(2000, SoundManager.ctx.currentTime);
+            gain.gain.setValueAtTime(0.02, SoundManager.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.03);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.03);
+        }
+    },
+    nature: {
+        click: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1000, SoundManager.ctx.currentTime);
+            gain.gain.setValueAtTime(0.04, SoundManager.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.08);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.08);
+        },
+        openWindow: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, SoundManager.ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(700, SoundManager.ctx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0, SoundManager.ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.08, SoundManager.ctx.currentTime + 0.15);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.3);
+        },
+        closeWindow: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(700, SoundManager.ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(400, SoundManager.ctx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0, SoundManager.ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.08, SoundManager.ctx.currentTime + 0.15);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.3);
+        },
+        minimize: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(500, SoundManager.ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(250, SoundManager.ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.05, SoundManager.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.15);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.15);
+        },
+        error: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(180, SoundManager.ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(120, SoundManager.ctx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.08, SoundManager.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.4);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.4);
+        },
+        notification: () => {
+            if (!SoundManager.ctx) return;
+            const osc1 = SoundManager.ctx.createOscillator();
+            const osc2 = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc1.type = 'sine';
+            osc2.type = 'sine';
+            osc1.frequency.setValueAtTime(880, SoundManager.ctx.currentTime);
+            osc2.frequency.setValueAtTime(1320, SoundManager.ctx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0, SoundManager.ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.1, SoundManager.ctx.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.5);
+            osc1.connect(gain);
+            osc2.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc1.start();
+            osc2.start(SoundManager.ctx.currentTime + 0.1);
+            osc1.stop(SoundManager.ctx.currentTime + 0.5);
+            osc2.stop(SoundManager.ctx.currentTime + 0.5);
+        },
+        typing: () => {
+            if (!SoundManager.ctx) return;
+            const osc = SoundManager.ctx.createOscillator();
+            const gain = SoundManager.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1800, SoundManager.ctx.currentTime);
+            gain.gain.setValueAtTime(0.02, SoundManager.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, SoundManager.ctx.currentTime + 0.04);
+            osc.connect(gain);
+            gain.connect(SoundManager.masterGain);
+            osc.start();
+            osc.stop(SoundManager.ctx.currentTime + 0.04);
+        }
+    },
+    silent: {
+        click: () => {},
+        openWindow: () => {},
+        closeWindow: () => {},
+        minimize: () => {},
+        error: () => {},
+        notification: () => {},
+        typing: () => {}
+    }
+};
+
+// Adicionar método setTheme ao SoundManager
+SoundManager.currentTheme = localStorage.getItem('glassos_sound_theme') || 'glass';
+SoundManager.setTheme = function(themeName) {
+    if (soundThemes[themeName]) {
+        this.currentTheme = themeName;
+        localStorage.setItem('glassos_sound_theme', themeName);
+        return true;
+    }
+    return false;
+};
+// Sobrescrever play para usar temas
+SoundManager.playWithTheme = function(eventType) {
+    if (!this.initialized || this.isMuted || !this.ctx) return;
+    if (this.currentTheme === 'silent') return;
+    this.resume();
+    const theme = soundThemes[this.currentTheme];
+    if (theme && theme[eventType]) {
+        theme[eventType]();
+    }
+};
+
+// ===== ENGINE DE PARTÍCULAS DO MOUSE =====
+const ParticleEngine = {
+    canvas: null,
+    ctx: null,
+    particles: [],
+    enabled: false,
+    particleType: 'sparkle',
+    animationId: null,
+    
+    init() {
+        this.canvas = document.getElementById('particle-canvas');
+        if (!this.canvas) return;
+        
+        this.ctx = this.canvas.getContext('2d');
+        this.resize();
+        
+        // Carregar configurações
+        const savedEnabled = localStorage.getItem('glassos_particles_enabled');
+        const savedType = localStorage.getItem('glassos_particle_type');
+        this.enabled = savedEnabled === 'true';
+        this.particleType = savedType || 'sparkle';
+        
+        window.addEventListener('resize', () => this.resize());
+        
+        if (this.enabled) {
+            this.start();
+        }
+    },
+    
+    resize() {
+        if (!this.canvas) return;
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    },
+    
+    start() {
+        if (this.animationId) return;
+        this.enabled = true;
+        localStorage.setItem('glassos_particles_enabled', 'true');
+        this.animate();
+    },
+    
+    stop() {
+        this.enabled = false;
+        localStorage.setItem('glassos_particles_enabled', 'false');
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+            this.animationId = null;
+        }
+        this.particles = [];
+        if (this.ctx) {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+    },
+    
+    setParticleType(type) {
+        this.particleType = type;
+        localStorage.setItem('glassos_particle_type', type);
+    },
+    
+    spawn(x, y, type = null) {
+        if (!this.enabled || !this.ctx) return;
+        
+        const particleType = type || this.particleType;
+        const count = particleType === 'matrix' ? 3 : 1;
+        
+        for (let i = 0; i < count; i++) {
+            let particle;
+            
+            switch (particleType) {
+                case 'star':
+                    particle = {
+                        x: x + (Math.random() - 0.5) * 10,
+                        y: y + (Math.random() - 0.5) * 10,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2 + 1,
+                        life: 1,
+                        decay: 0.02 + Math.random() * 0.02,
+                        size: 3 + Math.random() * 4,
+                        color: `hsl(${45 + Math.random() * 15}, 100%, ${60 + Math.random() * 20}%)`,
+                        type: 'star'
+                    };
+                    break;
+                case 'matrix':
+                    particle = {
+                        x: x + (Math.random() - 0.5) * 20,
+                        y: y + (Math.random() - 0.5) * 20,
+                        vx: 0,
+                        vy: 2 + Math.random() * 3,
+                        life: 1,
+                        decay: 0.03 + Math.random() * 0.02,
+                        size: 8 + Math.random() * 8,
+                        color: `rgba(0, ${150 + Math.random() * 105}, 0, ${0.5 + Math.random() * 0.5})`,
+                        char: String.fromCharCode(0x30A0 + Math.random() * 96),
+                        type: 'matrix'
+                    };
+                    break;
+                default: // sparkle
+                    particle = {
+                        x: x + (Math.random() - 0.5) * 8,
+                        y: y + (Math.random() - 0.5) * 8,
+                        vx: (Math.random() - 0.5) * 1.5,
+                        vy: (Math.random() - 0.5) * 1.5,
+                        life: 1,
+                        decay: 0.03 + Math.random() * 0.02,
+                        size: 2 + Math.random() * 3,
+                        color: `hsla(${200 + Math.random() * 60}, 80%, 70%,`,
+                        type: 'sparkle'
+                    };
+            }
+            
+            this.particles.push(particle);
+        }
+    },
+    
+    animate() {
+        if (!this.enabled || !this.ctx) return;
+        
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            const p = this.particles[i];
+            
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= p.decay;
+            
+            if (p.life <= 0) {
+                this.particles.splice(i, 1);
+                continue;
+            }
+            
+            this.ctx.save();
+            this.ctx.globalAlpha = p.life;
+            
+            if (p.type === 'star') {
+                this.ctx.fillStyle = p.color;
+                this.ctx.beginPath();
+                for (let j = 0; j < 5; j++) {
+                    const angle = (j * 4 * Math.PI) / 5 - Math.PI / 2;
+                    const x = p.x + Math.cos(angle) * p.size;
+                    const y = p.y + Math.sin(angle) * p.size;
+                    if (j === 0) this.ctx.moveTo(x, y);
+                    else this.ctx.lineTo(x, y);
+                }
+                this.ctx.closePath();
+                this.ctx.fill();
+            } else if (p.type === 'matrix') {
+                this.ctx.fillStyle = p.color;
+                this.ctx.font = `${p.size}px monospace`;
+                this.ctx.fillText(p.char, p.x, p.y);
+            } else { // sparkle
+                const gradient = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+                gradient.addColorStop(0, `${p.color} ${p.life})`);
+                gradient.addColorStop(1, `${p.color} 0)`);
+                this.ctx.fillStyle = gradient;
+                this.ctx.beginPath();
+                this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+            
+            this.ctx.restore();
+        }
+        
+        this.animationId = requestAnimationFrame(() => this.animate());
+    }
+};
+
+// ===== SNAP MANAGER AVANÇADO (WINDOWS 11 STYLE) =====
+const SnapManager = {
+    previewOverlay: null,
+    popupMenu: null,
+    activeWindow: null,
+    currentZone: null,
+    hoverTimeout: null,
+    
+    zones: [
+        { id: 'left', icon: '<rect x="2" y="4" width="10" height="16" rx="1"/>', label: 'Esquerda' },
+        { id: 'right', icon: '<rect x="10" y="4" width="10" height="16" rx="1"/>', label: 'Direita' },
+        { id: 'maximize', icon: '<rect x="2" y="2" width="20" height="20" rx="1"/>', label: 'Maximizar' },
+        { id: 'top-left', icon: '<path d="M2 2h10v10H2z"/>', label: 'Canto Superior Esq' },
+        { id: 'top-right', icon: '<path d="M12 2h10v10H12z"/>', label: 'Canto Superior Dir' },
+        { id: 'bottom-left', icon: '<path d="M2 12h10v10H2z"/>', label: 'Canto Inferior Esq' },
+        { id: 'bottom-right', icon: '<path d="M12 12h10v10H12z"/>', label: 'Canto Inferior Dir' }
+    ],
+    
+    init() {
+        this.createPreviewOverlay();
+        this.createPopupMenu();
+        this.setupGlobalEvents();
+    },
+    
+    createPreviewOverlay() {
+        // Usa o overlay existente no HTML
+        this.previewOverlay = document.getElementById('snap-overlay');
+        if (!this.previewOverlay) {
+            this.previewOverlay = document.createElement('div');
+            this.previewOverlay.id = 'snap-overlay';
+            this.previewOverlay.className = 'snap-overlay';
+            document.body.appendChild(this.previewOverlay);
+        }
+        
+        // Criar zonas dinamicamente se não existirem
+        if (this.previewOverlay.children.length === 0) {
+            ['half-left', 'half-right'].forEach(layout => {
+                const zone = document.createElement('div');
+                zone.className = `snap-zone ${layout}`;
+                zone.dataset.layout = layout;
+                zone.addEventListener('click', () => {
+                    if (this.activeWindow) {
+                        this.applySnap(this.activeWindow, layout === 'half-left' ? 'left' : 'right');
+                        this.hidePreview();
+                    }
+                });
+                this.previewOverlay.appendChild(zone);
+            });
+        }
+    },
+    
+    createPopupMenu() {
+        this.popupMenu = document.getElementById('snap-popup-menu');
+        if (!this.popupMenu) {
+            this.popupMenu = document.createElement('div');
+            this.popupMenu.id = 'snap-popup-menu';
+            this.popupMenu.className = 'snap-popup-menu hidden';
+            document.body.appendChild(this.popupMenu);
+        }
+        
+        this.popupMenu.innerHTML = this.zones.map(zone => `
+            <div class="snap-popup-item" data-zone="${zone.id}" title="${zone.label}">
+                <svg viewBox="0 0 24 24">${zone.icon}</svg>
+            </div>
+        `).join('');
+        
+        this.popupMenu.querySelectorAll('.snap-popup-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.activeWindow) {
+                    this.applySnap(this.activeWindow, item.dataset.zone);
+                }
+                this.hidePopupMenu();
+            });
+        });
+    },
+    
+    setupGlobalEvents() {
+        let dragTimeout;
+        
+        document.addEventListener('mousemove', (e) => {
+            // Verificar se há janela sendo arrastada
+            if (WindowManager.dragState && WindowManager.dragState.isDragging) {
+                clearTimeout(dragTimeout);
+                dragTimeout = setTimeout(() => {
+                    const winData = WindowManager.windows.get(WindowManager.dragState.winId);
+                    if (!winData) return;
+                    
+                    const edgeThreshold = 20;
+                    let zone = null;
+                    
+                    if (e.clientY < edgeThreshold) {
+                        zone = 'maximize';
+                    } else if (e.clientX < edgeThreshold) {
+                        zone = 'left';
+                    } else if (e.clientX > window.innerWidth - edgeThreshold) {
+                        zone = 'right';
+                    }
+                    
+                    if (zone) {
+                        this.showPreview(winData.element, zone);
+                    } else {
+                        this.hidePreview();
+                    }
+                }, 300);
+            }
+            
+            // Atualizar posição do popup se visível
+            if (this.popupMenu && !this.popupMenu.classList.contains('hidden')) {
+                const rect = this.popupMenu.getBoundingClientRect();
+                if (e.clientX < rect.left || e.clientX > rect.right || 
+                    e.clientY < rect.top || e.clientY > rect.bottom) {
+                    // Mouse saiu do popup, mas mantém se estiver perto do botão
+                }
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            clearTimeout(dragTimeout);
+            if (this.currentZone && this.activeWindow) {
+                this.applySnap(this.activeWindow, this.currentZone);
+            }
+            this.hidePreview();
+        });
+        
+        // Fechar popup ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!this.popupMenu.contains(e.target)) {
+                this.hidePopupMenu();
+            }
+        });
+    },
+    
+    showPreview(winElement, zone) {
+        this.activeWindow = winElement;
+        this.currentZone = zone;
+        
+        // Mostrar overlay para zonas de borda
+        if (['left', 'right', 'maximize'].includes(zone)) {
+            this.previewOverlay.classList.add('active');
+        }
+    },
+    
+    hidePreview() {
+        this.previewOverlay.classList.remove('active');
+        this.currentZone = null;
+    },
+    
+    showPopupMenu(buttonElement, winId) {
+        const winData = WindowManager.windows.get(winId);
+        if (!winData) return;
+        
+        this.activeWindow = winData.element;
+        
+        const rect = buttonElement.getBoundingClientRect();
+        const popupRect = this.popupMenu.getBoundingClientRect();
+        
+        let left = rect.right - popupRect.width - 10;
+        let top = rect.bottom + 5;
+        
+        // Ajustar se sair da tela
+        if (left < 10) left = 10;
+        if (top + popupRect.height > window.innerHeight) {
+            top = rect.top - popupRect.height - 5;
+        }
+        
+        this.popupMenu.style.left = `${left}px`;
+        this.popupMenu.style.top = `${top}px`;
+        this.popupMenu.classList.remove('hidden');
+    },
+    
+    hidePopupMenu() {
+        this.popupMenu.classList.add('hidden');
+    },
+    
+    applySnap(winElement, zone) {
+        const winData = Array.from(WindowManager.windows.values()).find(w => w.element === winElement);
+        if (!winData) return;
+        
+        const taskbarHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--taskbar-height'));
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight - taskbarHeight;
+        const gap = 4;
+        
+        // Remover estado maximizado se existir
+        winElement.classList.remove('maximized');
+        winData.maximized = false;
+        
+        let left, top, width, height;
+        
+        switch (zone) {
+            case 'left':
+                left = gap;
+                top = gap;
+                width = screenWidth / 2 - gap * 2;
+                height = screenHeight - gap * 2;
+                break;
+            case 'right':
+                left = screenWidth / 2 + gap;
+                top = gap;
+                width = screenWidth / 2 - gap * 2;
+                height = screenHeight - gap * 2;
+                break;
+            case 'maximize':
+                left = 0;
+                top = 0;
+                width = screenWidth;
+                height = screenHeight;
+                winElement.classList.add('maximized');
+                winData.maximized = true;
+                break;
+            case 'top-left':
+                left = gap;
+                top = gap;
+                width = screenWidth / 2 - gap * 2;
+                height = screenHeight / 2 - gap * 2;
+                break;
+            case 'top-right':
+                left = screenWidth / 2 + gap;
+                top = gap;
+                width = screenWidth / 2 - gap * 2;
+                height = screenHeight / 2 - gap * 2;
+                break;
+            case 'bottom-left':
+                left = gap;
+                top = screenHeight / 2 + gap;
+                width = screenWidth / 2 - gap * 2;
+                height = screenHeight / 2 - gap * 2;
+                break;
+            case 'bottom-right':
+                left = screenWidth / 2 + gap;
+                top = screenHeight / 2 + gap;
+                width = screenWidth / 2 - gap * 2;
+                height = screenHeight / 2 - gap * 2;
+                break;
+            default:
+                return;
+        }
+        
+        winElement.style.left = `${left}px`;
+        winElement.style.top = `${top}px`;
+        winElement.style.width = `${width}px`;
+        winElement.style.height = `${height}px`;
+        
+        // Salvar estado
+        Storage.set(`window_${winData.id}_position`, { left, top, width, height });
+        
+        // Tocar som
+        SoundManager.playWithTheme('openWindow');
+    }
+};
+
 // Carregar configurações de áudio salvas
 (function loadAudioSettings() {
     const savedVol = localStorage.getItem('glassos_volume');
@@ -1296,8 +2065,65 @@ Apps.Settings = function() {
     const settings = ThemeManager.getSettings();
     let wallpaperOptionsHTML = '';
     Object.entries(ThemeManager.wallpapers).forEach(([name, gradient]) => { wallpaperOptionsHTML += `<div class="wallpaper-option ${settings.wallpaper === gradient ? 'selected' : ''}" data-wallpaper="${gradient}" style="background: ${gradient};" title="${name}"></div>`; });
-    const html = `<div class="settings-container"><div class="settings-section"><h3>${renderIcon('paint', 20)} Tema</h3><div class="settings-option"><label>Tema do sistema</label><select data-setting="theme"><option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>Escuro</option><option value="light" ${settings.theme === 'light' ? 'selected' : ''}>Claro</option><option value="glass" ${settings.theme === 'glass' ? 'selected' : ''}>Glass</option><option value="retro" ${settings.theme === 'retro' ? 'selected' : ''}>Retro</option><option value="cyberpunk" ${settings.theme === 'cyberpunk' ? 'selected' : ''}>Cyberpunk</option></select></div></div><div class="settings-section"><h3>${renderIcon('imageeditor', 20)} Papel de Parede</h3><div class="wallpaper-grid">${wallpaperOptionsHTML}</div><div class="wallpaper-custom-input"><input type="text" placeholder="URL de imagem personalizada..." id="custom-wallpaper-url"><button id="apply-custom-wallpaper">Aplicar</button></div></div><div class="settings-section"><h3>🔊 Som</h3><div class="settings-option"><label>Volume</label><input type="range" min="0" max="100" value="${Math.round((SoundManager.volume || 0.3) * 100)}" id="sound-volume-slider" style="width:150px;"></div><div class="settings-option"><label>Mutar sistema</label><button id="btn-sound-mute" style="padding:6px 14px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:6px;cursor:pointer;font-size:12px;">${SoundManager.isMuted ? 'Desmutar' : 'Mutuar'}</button></div><div class="settings-option"><label>Testar sons</label><button id="btn-test-sounds" style="padding:6px 14px;border:1px solid var(--accent-color);background:transparent;color:var(--accent-color);border-radius:6px;cursor:pointer;font-size:12px;">Tocar SFX</button></div></div><div class="settings-section"><h3>✨ Aparência</h3><div class="settings-option"><label>Transparência</label><input type="range" min="50" max="100" value="${Math.round(settings.transparency * 100)}" data-setting="transparency"></div><div class="settings-option"><label>Desfoque (Blur)</label><input type="range" min="0" max="40" value="${settings.blur}" data-setting="blur"></div><div class="settings-option"><label>Modo Leve</label><button id="toggle-light-mode" style="padding:6px 14px;border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);border-radius:6px;cursor:pointer;font-size:12px;">${PerformanceOptimizer.mode === 'light' ? 'Desativar' : 'Ativar'}</button></div></div><div class="settings-section"><h3>${renderIcon('sysmon', 20)} Sobre o GlassOS</h3><div class="settings-option"><label>Versão</label><span style="font-size:13px; color:var(--text-secondary);">GlassOS v1.2</span></div></div><div class="settings-section"><h3>🗃️ Dados</h3><div class="settings-option"><label>Limpar dados</label><button id="btn-clear-data" style="padding:6px 14px; border:1px solid var(--danger-color); background:transparent; color:var(--danger-color); border-radius:6px; cursor:pointer; font-size:12px;">Limpar</button></div></div></div>`;
-    const winData = WindowManager.create('settings', 'Configurações', GlassIcons.settings, html, { width: 550, height: 620 });
+    
+    // Opções de tema sonoro
+    const soundThemesOptions = [
+        { value: 'glass', label: 'Glass (Padrão)' },
+        { value: 'mechanical', label: 'Mecânico' },
+        { value: 'scifi', label: 'Sci-Fi' },
+        { value: 'nature', label: 'Natureza' },
+        { value: 'silent', label: 'Silencioso' }
+    ];
+    const currentSoundTheme = SoundManager.currentTheme || 'glass';
+    const soundThemeOptionsHTML = soundThemesOptions.map(t => 
+        `<option value="${t.value}" ${t.value === currentSoundTheme ? 'selected' : ''}>${t.label}</option>`
+    ).join('');
+    
+    // Estado das partículas
+    const particlesEnabled = localStorage.getItem('glassos_particles_enabled') === 'true';
+    const particleType = localStorage.getItem('glassos_particle_type') || 'sparkle';
+    const particleTypes = [
+        { value: 'sparkle', label: 'Brilho' },
+        { value: 'star', label: 'Estrelas' },
+        { value: 'matrix', label: 'Matrix' },
+        { value: 'none', label: 'Nenhum' }
+    ];
+    const particleTypeOptionsHTML = particleTypes.map(t => 
+        `<option value="${t.value}" ${t.value === particleType ? 'selected' : ''}>${t.label}</option>`
+    ).join('');
+    
+    const html = `<div class="settings-container">
+        <div class="settings-section"><h3>${renderIcon('paint', 20)} Tema</h3>
+            <div class="settings-option"><label>Tema do sistema</label><select data-setting="theme"><option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>Escuro</option><option value="light" ${settings.theme === 'light' ? 'selected' : ''}>Claro</option><option value="glass" ${settings.theme === 'glass' ? 'selected' : ''}>Glass</option><option value="retro" ${settings.theme === 'retro' ? 'selected' : ''}>Retro</option><option value="cyberpunk" ${settings.theme === 'cyberpunk' ? 'selected' : ''}>Cyberpunk</option></select></div>
+        </div>
+        <div class="settings-section"><h3>${renderIcon('imageeditor', 20)} Papel de Parede</h3>
+            <div class="wallpaper-grid">${wallpaperOptionsHTML}</div>
+            <div class="wallpaper-custom-input"><input type="text" placeholder="URL de imagem personalizada..." id="custom-wallpaper-url"><button id="apply-custom-wallpaper">Aplicar</button></div>
+        </div>
+        <div class="settings-section"><h3>🔊 Som</h3>
+            <div class="settings-option"><label>Volume</label><input type="range" min="0" max="100" value="${Math.round((SoundManager.volume || 0.3) * 100)}" id="sound-volume-slider" style="width:150px;"></div>
+            <div class="settings-option"><label>Mutar sistema</label><button id="btn-sound-mute">${SoundManager.isMuted ? 'Desmutar' : 'Mutuar'}</button></div>
+            <div class="settings-option"><label>Pacote de Sons</label><select id="sound-theme-select">${soundThemeOptionsHTML}</select></div>
+            <div class="settings-option"><label>Testar sons</label><button id="btn-test-sounds">Tocar SFX</button></div>
+        </div>
+        <div class="settings-section"><h3>🎨 Efeitos Visuais</h3>
+            <div class="settings-option"><label>Ativar Rastro do Mouse</label><button id="toggle-particles">${particlesEnabled ? 'Desativar' : 'Ativar'}</button></div>
+            <div class="settings-option"><label>Tipo de Partícula</label><select id="particle-type-select">${particleTypeOptionsHTML}</select></div>
+        </div>
+        <div class="settings-section"><h3>✨ Aparência</h3>
+            <div class="settings-option"><label>Transparência</label><input type="range" min="50" max="100" value="${Math.round(settings.transparency * 100)}" data-setting="transparency"></div>
+            <div class="settings-option"><label>Desfoque (Blur)</label><input type="range" min="0" max="40" value="${settings.blur}" data-setting="blur"></div>
+            <div class="settings-option"><label>Modo Leve</label><button id="toggle-light-mode">${PerformanceOptimizer.mode === 'light' ? 'Desativar' : 'Ativar'}</button></div>
+        </div>
+        <div class="settings-section"><h3>${renderIcon('sysmon', 20)} Sobre o GlassOS</h3>
+            <div class="settings-option"><label>Versão</label><span style="font-size:13px; color:var(--text-secondary);">GlassOS v1.3</span></div>
+        </div>
+        <div class="settings-section"><h3>🗃️ Dados</h3>
+            <div class="settings-option"><label>Limpar dados</label><button id="btn-clear-data">Limpar</button></div>
+        </div>
+    </div>`;
+    
+    const winData = WindowManager.create('settings', 'Configurações', GlassIcons.settings, html, { width: 580, height: 720 });
     
     // Controles de som
     const volumeSlider = winData.element.querySelector('#sound-volume-slider');
@@ -1326,7 +2152,48 @@ Apps.Settings = function() {
     if (btnTest) {
         btnTest.addEventListener('click', () => {
             SoundManager.init();
-            SoundManager.play('test');
+            SoundManager.playWithTheme('test') || SoundManager.play('test');
+        });
+    }
+    
+    // Controles de tema sonoro
+    const soundThemeSelect = winData.element.querySelector('#sound-theme-select');
+    if (soundThemeSelect) {
+        soundThemeSelect.addEventListener('change', (e) => {
+            SoundManager.setTheme(e.target.value);
+            NotificationSystem.show('Tema Sonoro', `Tema "${e.target.options[e.target.selectedIndex].text}" aplicado`, 'info', 2000);
+        });
+    }
+    
+    // Controles de partículas
+    const toggleParticles = winData.element.querySelector('#toggle-particles');
+    const particleTypeSelect = winData.element.querySelector('#particle-type-select');
+    
+    if (toggleParticles) {
+        toggleParticles.addEventListener('click', () => {
+            if (ParticleEngine.enabled) {
+                ParticleEngine.stop();
+                toggleParticles.textContent = 'Ativar';
+            } else {
+                ParticleEngine.start();
+                toggleParticles.textContent = 'Desativar';
+            }
+        });
+    }
+    
+    if (particleTypeSelect) {
+        particleTypeSelect.addEventListener('change', (e) => {
+            const type = e.target.value;
+            if (type === 'none') {
+                ParticleEngine.stop();
+                if (toggleParticles) toggleParticles.textContent = 'Ativar';
+            } else {
+                ParticleEngine.setParticleType(type);
+                if (!ParticleEngine.enabled) {
+                    ParticleEngine.start();
+                    if (toggleParticles) toggleParticles.textContent = 'Desativar';
+                }
+            }
         });
     }
     
@@ -1562,6 +2429,10 @@ const GlassOS = {
         
         // Inicializar QuickSettingsManager
         QuickSettingsManager.init();
+        
+        // Inicializar novos sistemas: Partículas e Snap Manager
+        ParticleEngine.init();
+        SnapManager.init();
         
         // Iniciar sequência de boot
         this.runBootSequence();
